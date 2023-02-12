@@ -3,12 +3,12 @@ import { SlashCommandBuilder } from'discord.js';
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('regrade_requests')
-		.setDescription('Assign you to someone else\'s regrade request!')
+		.setName('approve_request')
+		.setDescription('Get pending regraded requests!')
 		/* .addBooleanOption(option =>
 			option.setName('self')
 				.setDescription('Whether or not to show own requests only')) */,
 	async execute(interaction: ChatInputCommandInteraction<CacheType>) {
-		await interaction.reply('regrade requests!');
+		await interaction.reply('approve approvals!');
 	},
 };
