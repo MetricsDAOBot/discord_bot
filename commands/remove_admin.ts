@@ -4,8 +4,8 @@ import axios from '../services/axios';
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('add_admin')
-		.setDescription('Adds an admin!')
+		.setName('remove_admin')
+		.setDescription('Removes an admin!')
 		.addUserOption(option =>
 			option.setName('user')
 				.setDescription('Discord User')
@@ -14,20 +14,19 @@ module.exports = {
         try {
             let user = interaction.options.getUser('user');
             let res = await axios.post(
-                '/add_admin', 
+                '/remove_admin', 
                 { 
                     discord_id: user?.id, 
                     discord_name: `${user?.username}#${user?.discriminator}`, 
-                    added_by: `${interaction.user.username}#${interaction.user.discriminator}`, 
-                    added_by_id: interaction.user.id 
+                    removed_by_id: interaction.user.id 
                 });
 
             await interaction.reply({ content: res.data, ephemeral: true });
         }
 
         catch (e){
-            //console.log(e);
-            await interaction.reply({ content: "Error adding admin!", ephemeral: true });
+            console.log(e);
+            await interaction.reply({ content: "Error removing admin!", ephemeral: true });
         }
 	},
 };
