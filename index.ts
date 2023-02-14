@@ -146,6 +146,7 @@ client.on(Events.InteractionCreate, async interaction => {
 		await interaction.showModal(modal);
 	}
 
+	// pending approvals
 	else if (interaction.customId.includes('nav_approval_') || interaction.customId.includes('approve_')) {
 		try {
 			let { user } = interaction;
@@ -252,6 +253,68 @@ client.on(Events.InteractionCreate, async interaction => {
 
 			actionRow = new ActionRowBuilder().addComponents(button1, button2, button3) as any;
 			await interaction.update({ embeds: [dashboardEmbed], components: [actionRow] });
+		}
+
+		catch (e){
+			console.log(e);
+			await interaction.reply({ content: "Unable to get pending approvals.", ephemeral: true });
+		}
+	}
+
+	// when requesting for "my requests"
+	else if (interaction.customId.includes('nav_self_')) {
+		try {
+			let { user } = interaction;
+			let page = parseInt(interaction.customId.replace('nav_self_', ''));
+			let res = await axios.get<any, AxiosResponse<RegradeRequest[] | string>>(`/regrade_requests/${user.id}/${page}`);
+
+			if(typeof res.data === "string") {
+				await interaction.reply({ content: res.data, ephemeral: true });
+				return;
+			}
+
+			if(res.data.length === 0) {
+				await interaction.reply({ content: "You have no requests.", ephemeral: true });
+				return;
+			}
+
+			let ret = res.data[0];
+
+			// inside a command, event listener, etc.
+			const dashboardEmbed = new EmbedBuilder()
+								.setColor(0x0099FF)
+								.setTitle(`${user.username}'s Requests`)
+								.setDescription(ret.is_regrading? ' Review in Progress' : 'Pending Review')
+								.addFields(
+									{ name: 'Submission', value: ret.submission ?? "null" },
+									{ name: 'Current Score', value: ret.current_score?.toString() ?? 'null' },
+									{ name: 'Expected Score', value: ret.expected_score?.toString() ?? 'null' },
+									{ name: 'Reason', value: ret.reason ?? "null" },
+									{ name: '\u200B', value: '\u200B' },
+									{ name: 'Regraded Score', value: ret.regraded_score?.toString() ?? "Not Regraded Yet" },
+									{ name: 'Regraded Reason', value: ret.regraded_reason ?? "Not Regraded Yet" },
+									{ name: '\u200B', value: '\u200B' },
+									{ name: 'Submitted At', value: moment(ret.created_at).format('YYYY-MM-DD HH:mm:ss') },
+									{ name: 'Regraded At', value: ret.regraded_at? moment(ret.regraded_at).format('YYYY-MM-DD HH:mm:ss') : "Not Regraded Yet" },
+								);
+
+			const button1 = new ButtonBuilder()
+								.setCustomId(`nav_self_${page - 1}`) // split it when processing interaction
+								.setLabel('<')
+								.setStyle(ButtonStyle.Primary)
+								.setDisabled(page - 1 < 0);
+
+			const button3 = new ButtonBuilder()
+								.setCustomId(`nav_self_${page + 1}`) // split it when processing interaction
+								.setLabel('>')
+								.setStyle(ButtonStyle.Primary)
+								// res.data.length is always 2
+								// less than 2 = no more data
+								.setDisabled(res.data.length < 2);
+
+			const actionRow = new ActionRowBuilder().addComponents(button1, button3) as any;
+
+			await interaction.update({  embeds: [dashboardEmbed], components: [actionRow] });
 		}
 
 		catch (e){
