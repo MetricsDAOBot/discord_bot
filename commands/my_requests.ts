@@ -36,11 +36,11 @@ module.exports = {
 									{ name: 'Expected Score', value: ret.expected_score?.toString() ?? 'null' },
 									{ name: 'Reason', value: ret.reason ?? "null" },
 									{ name: '\u200B', value: '\u200B' },
-									{ name: 'Regraded Score', value: ret.regraded_score?.toString() ?? "null" },
-									{ name: 'Regraded Reason', value: ret.regraded_reason ?? "null" },
+									{ name: 'Regraded Score', value: ret.regraded_score?.toString() ?? "Not Regraded Yet" },
+									{ name: 'Regraded Reason', value: ret.regraded_reason ?? "Not Regraded Yet" },
 									{ name: '\u200B', value: '\u200B' },
 									{ name: 'Submitted At', value: moment(ret.created_at).format('YYYY-MM-DD HH:mm:ss') },
-									{ name: 'Regraded At', value: moment(ret.regraded_at).format('YYYY-MM-DD HH:mm:ss') },
+									{ name: 'Regraded At', value: ret.regraded_at? moment(ret.regraded_at).format('YYYY-MM-DD HH:mm:ss') : "Not Regraded Yet" },
 								);
 
 			const button1 = new ButtonBuilder()
