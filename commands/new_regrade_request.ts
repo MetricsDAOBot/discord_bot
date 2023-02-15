@@ -1,7 +1,7 @@
 import { ActionRowBuilder, CacheType, ChatInputCommandInteraction, ModalBuilder, TextInputBuilder, TextInputStyle } from "discord.js";
 import { SlashCommandBuilder } from'discord.js';
 import axios from '../services/axios';
-import { isValidUUID } from "../utils/common";
+import { deleteReplyInteractionAfterSeconds, isValidUUID } from "../utils/common";
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -14,7 +14,8 @@ module.exports = {
 
 			// if new regrade request is added, it's gonna be a uuid
 			if(res.data === 0) {
-				await interaction.reply({ content: "You're out of Golden Tickets.", ephemeral: true });
+				await deleteReplyInteractionAfterSeconds(interaction, "You're out of Golden Tickets.", 5000);
+				// await interaction.reply({ content: "You're out of Golden Tickets.", ephemeral: true });
 				return;
 			}
 
@@ -84,7 +85,8 @@ module.exports = {
 
         catch (e){
             //console.log(e);
-            await interaction.reply({ content: "Error adding new request!", ephemeral: true });
+            await deleteReplyInteractionAfterSeconds(interaction, "Error adding new request!", 5000);
+            // await interaction.reply({ content: "Error adding new request!", ephemeral: true });
         }
 	},
 };

@@ -3,6 +3,7 @@ import { ActionRowBuilder, ButtonBuilder, ButtonStyle, CacheType, ChatInputComma
 import { SlashCommandBuilder } from'discord.js';
 import moment from "moment";
 import axios from '../services/axios';
+import { deleteReplyInteractionAfterSeconds } from "../utils/common";
 import { RegradeRequest } from "./types";
 
 module.exports = {
@@ -15,12 +16,14 @@ module.exports = {
 			let res = await axios.get<any, AxiosResponse<RegradeRequest[] | string>>(`/regrade_requests/${user.id}/0`);
 
 			if(typeof res.data === "string") {
-				await interaction.reply({ content: res.data, ephemeral: true });
+				await deleteReplyInteractionAfterSeconds(interaction, res.data, 5000);
+				// await interaction.reply({ content: res.data, ephemeral: true });
 				return;
 			}
 
 			if(res.data.length === 0) {
-				await interaction.reply({ content: "You have no requests.", ephemeral: true });
+				await deleteReplyInteractionAfterSeconds(interaction, "You have no requests.", 5000);
+				// await interaction.reply({ content: "You have no requests.", ephemeral: true });
 				return;
 			}
 
@@ -64,7 +67,8 @@ module.exports = {
 
 		catch (e){
 			console.log(e);
-			await interaction.reply({ content: "Unable to get your requests.", ephemeral: true });
+            await deleteReplyInteractionAfterSeconds(interaction, "Unable to get your requests.", 5000);
+			// await interaction.reply({ content: "Unable to get your requests.", ephemeral: true });
 		}
 	},
 };

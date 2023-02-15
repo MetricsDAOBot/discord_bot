@@ -1,6 +1,7 @@
 import { CacheType, ChatInputCommandInteraction } from "discord.js";
 import { SlashCommandBuilder } from'discord.js';
 import axios from '../services/axios';
+import { deleteReplyInteractionAfterSeconds } from "../utils/common";
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -22,12 +23,14 @@ module.exports = {
                     added_by_id: interaction.user.id 
                 });
 
-            await interaction.reply({ content: res.data, ephemeral: true });
+            await deleteReplyInteractionAfterSeconds(interaction, res.data, 5000);
+            // await interaction.reply({ content: res.data, ephemeral: true });
         }
 
         catch (e){
             //console.log(e);
-            await interaction.reply({ content: "Error adding admin!", ephemeral: true });
+            await deleteReplyInteractionAfterSeconds(interaction, "Error adding admin!", 5000);
+            // await interaction.reply({ content: "Error adding admin!", ephemeral: true });
         }
 	},
 };

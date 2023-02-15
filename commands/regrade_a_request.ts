@@ -3,6 +3,7 @@ import { ActionRowBuilder, ButtonBuilder, ButtonStyle, CacheType, ChatInputComma
 import { SlashCommandBuilder } from'discord.js';
 import moment from "moment";
 import axios from '../services/axios';
+import { deleteReplyInteractionAfterSeconds } from "../utils/common";
 import { RegradeRequest } from "./types";
 
 module.exports = {
@@ -24,7 +25,8 @@ module.exports = {
 			} */
 
 			if(typeof ret === "string") {
-				await interaction.reply({ content: ret, ephemeral: true });
+				await deleteReplyInteractionAfterSeconds(interaction, ret, 5000);
+				// await interaction.reply({ content: ret, ephemeral: true });
 				return;
 			}
 
@@ -55,7 +57,8 @@ module.exports = {
 
 		catch (e){
 			console.log(e);
-            await interaction.reply({ content: "Error assigning you to a request!", ephemeral: true });
+            await deleteReplyInteractionAfterSeconds(interaction, "Error assigning you to a request!", 5000);
+            // await interaction.reply({ content: "Error assigning you to a request!", ephemeral: true });
 		}
 	},
 };

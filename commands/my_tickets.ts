@@ -1,6 +1,7 @@
 import { CacheType, ChatInputCommandInteraction } from "discord.js";
 import { SlashCommandBuilder } from'discord.js';
 import axios from '../services/axios';
+import { deleteReplyInteractionAfterSeconds } from "../utils/common";
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -10,12 +11,14 @@ module.exports = {
         try {
             let {user} = interaction;
             let res = await axios.get(`/ticket_count/${user.id}`);
-            await interaction.reply({ content: `You have ${res.data.toString()} ticket(s).`, ephemeral: true });
+            await deleteReplyInteractionAfterSeconds(interaction, `You have ${res.data.toString()} ticket(s).`, 5000);
+            // await interaction.reply({ content: `You have ${res.data.toString()} ticket(s).`, ephemeral: true });
         }
 
         catch (e){
             //console.log(e);
-            await interaction.reply({ content: "Unable to get your ticket count!", ephemeral: true });
+            await deleteReplyInteractionAfterSeconds(interaction, "Unable to get your ticket count!", 5000);
+            // await interaction.reply({ content: "Unable to get your ticket count!", ephemeral: true });
         }
 	},
 };
