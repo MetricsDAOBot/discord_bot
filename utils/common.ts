@@ -15,8 +15,7 @@ export function sleep(ms: number) {
 }
 
 export async function deleteReplyInteractionAfterSeconds(interaction: ChatInputCommandInteraction | ModalSubmitInteraction | ButtonInteraction, content: string, s: number) {
-    let response = await interaction.reply({ content, ephemeral: true });
+    await interaction.reply({ content, ephemeral: true });
     await sleep(5000);
-    let message = (await response.awaitMessageComponent()).message;
-    await interaction.deleteReply(message);
+    await interaction.deleteReply();
 }
