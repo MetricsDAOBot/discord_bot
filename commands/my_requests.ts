@@ -1,15 +1,18 @@
 import { AxiosResponse } from "axios";
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, CacheType, ChatInputCommandInteraction, EmbedBuilder } from "discord.js";
+import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, CacheType, ChatInputCommandInteraction, EmbedBuilder } from "discord.js";
 import { SlashCommandBuilder } from'discord.js';
 import moment from "moment";
 import axios from '../services/axios';
-import { deleteReplyInteractionAfterSeconds } from "../utils/common";
+import { deleteReplyInteractionAfterSeconds, sleep } from "../utils/common";
 import { RegradeRequest } from "./types";
 
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('my_requests')
-		.setDescription('Get your requests!'),
+		.setDescription('Get your requests!')
+		.addBooleanOption(option =>
+			option.setName('as_csv')
+				.setDescription('Reply as CSV?')),
 	async execute(interaction: ChatInputCommandInteraction<CacheType>) {
 		try {
 			let { user } = interaction;
@@ -28,6 +31,24 @@ module.exports = {
 			}
 
 			let ret = res.data[0];
+
+			let asCsv = interaction.options.getBoolean('as_csv');
+
+			//return csv file
+			if(asCsv) {
+				let allRequests = await axios.get<any, AxiosResponse<RegradeRequest[]>>(`/regrade_requests/${user.id}`);
+				let ret = '"discord_name","created_at","updated_at","regraded_at","approved_at","uuid","is_regrading","link","grader_feedback","current_score","expected_score","reason","regraded_score","regraded_reason"';
+				allRequests.data.forEach(request => {
+					const {discord_name, created_at, updated_at, regraded_at, approved_at, uuid, is_regrading, submission, grader_feedback, current_score, expected_score, reason, regraded_score, regraded_reason} = request;
+					ret += `\n"${discord_name}","${created_at}","${updated_at}","${regraded_at ?? "Not Regraded"}","${approved_at ?? "Not Approved"}","${uuid}","${is_regrading? "Yes" : "No"}","${submission ?? "-"}","${grader_feedback ?? "-"}","${current_score ?? "-"}","${expected_score ?? "-"}","${reason ?? "-"}","${regraded_score ?? "-"}","${regraded_reason ?? "-"}"`;
+				});
+				let buffer = Buffer.from(ret);
+				let attachment = new AttachmentBuilder(buffer, { name: 'my_requests.csv' });
+				await interaction.reply({ files: [attachment]});
+				await sleep(30000);
+				await interaction.deleteReply();
+				return;
+			}
 
 			// inside a command, event listener, etc.
 			const dashboardEmbed = new EmbedBuilder()

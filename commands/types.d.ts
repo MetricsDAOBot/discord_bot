@@ -19,5 +19,11 @@ export type RegradeRequest = {
     regraded_score: number | null;
     regraded_reason: string | null;
 
+    approved_at: string | null;
+    approved_by: string | null;
+    approved_by_id: string | null;
+
     deleted_at: string | null;
 }
+
+export type RegradeRequestCSV = RegradeRequest & { is_admin: boolean }
