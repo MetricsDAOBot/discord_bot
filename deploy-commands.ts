@@ -1,3 +1,7 @@
+/**
+ * Registers all slash commands for the bot, otherwise there will be no slash command suggestions.
+ */
+
 import { REST, Routes } from 'discord.js';
 import fs from 'node:fs';
 import 'dotenv/config';

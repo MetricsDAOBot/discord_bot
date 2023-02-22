@@ -1,3 +1,7 @@
+/**
+ * Needed to load commands for the slash commands to work.
+ */
+
 import { Client, Collection } from "discord.js";
 import fs from'node:fs';
 import path from'node:path';

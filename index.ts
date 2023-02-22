@@ -15,7 +15,7 @@ const client = new CustomClient({intents: [
     GatewayIntentBits.MessageContent,
 ]});
 
-client.on("messageCreate", function(message) {
+client.on(Events.MessageCreate, function(message) {
     if (message.author.bot) return;
 });
 
