@@ -25,7 +25,7 @@ module.exports = {
 			} */
 
 			if(typeof ret === "string") {
-				await deleteReplyInteractionAfterSeconds(interaction, ret, 5000);
+				await deleteReplyInteractionAfterSeconds(interaction, ret, 5);
 				// await interaction.reply({ content: ret, ephemeral: true });
 				return;
 			}
@@ -57,7 +57,7 @@ module.exports = {
 
 		catch (e){
 			console.log(e);
-            await deleteReplyInteractionAfterSeconds(interaction, "Error assigning you to a request!", 5000);
+            await deleteReplyInteractionAfterSeconds(interaction, "Error assigning you to a request!", 5);
             // await interaction.reply({ content: "Error assigning you to a request!", ephemeral: true });
 		}
 	},

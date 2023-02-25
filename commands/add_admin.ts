@@ -23,13 +23,13 @@ module.exports = {
                     added_by_id: interaction.user.id 
                 });
 
-            await deleteReplyInteractionAfterSeconds(interaction, res.data, 5000);
+            await deleteReplyInteractionAfterSeconds(interaction, res.data, 5);
             // await interaction.reply({ content: res.data, ephemeral: true });
         }
 
         catch (e){
             //console.log(e);
-            await deleteReplyInteractionAfterSeconds(interaction, "Error adding admin!", 5000);
+            await deleteReplyInteractionAfterSeconds(interaction, "Error adding admin!", 5);
             // await interaction.reply({ content: "Error adding admin!", ephemeral: true });
         }
 	},

@@ -11,13 +11,13 @@ module.exports = {
         try {
             let {user} = interaction;
             let res = await axios.get(`/ticket_count/${user.id}`);
-            await deleteReplyInteractionAfterSeconds(interaction, `You have ${res.data.toString()} ticket(s).`, 5000);
+            await deleteReplyInteractionAfterSeconds(interaction, `You have ${res.data.toString()} ticket(s).`, 5);
             // await interaction.reply({ content: `You have ${res.data.toString()} ticket(s).`, ephemeral: true });
         }
 
         catch (e){
             //console.log(e);
-            await deleteReplyInteractionAfterSeconds(interaction, "Unable to get your ticket count!", 5000);
+            await deleteReplyInteractionAfterSeconds(interaction, "Unable to get your ticket count!", 5);
             // await interaction.reply({ content: "Unable to get your ticket count!", ephemeral: true });
         }
 	},

@@ -19,13 +19,13 @@ module.exports = {
 			let res = await axios.get<any, AxiosResponse<RegradeRequest[] | string>>(`/regrade_requests/${user.id}/0`);
 
 			if(typeof res.data === "string") {
-				await deleteReplyInteractionAfterSeconds(interaction, res.data, 5000);
+				await deleteReplyInteractionAfterSeconds(interaction, res.data, 5);
 				// await interaction.reply({ content: res.data, ephemeral: true });
 				return;
 			}
 
 			if(res.data.length === 0) {
-				await deleteReplyInteractionAfterSeconds(interaction, "You have no requests.", 5000);
+				await deleteReplyInteractionAfterSeconds(interaction, "You have no requests.", 5);
 				// await interaction.reply({ content: "You have no requests.", ephemeral: true });
 				return;
 			}
@@ -88,7 +88,7 @@ module.exports = {
 
 		catch (e){
 			console.log(e);
-            await deleteReplyInteractionAfterSeconds(interaction, "Unable to get your requests.", 5000);
+            await deleteReplyInteractionAfterSeconds(interaction, "Unable to get your requests.", 5);
 			// await interaction.reply({ content: "Unable to get your requests.", ephemeral: true });
 		}
 	},

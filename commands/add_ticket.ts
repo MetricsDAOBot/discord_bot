@@ -33,13 +33,13 @@ module.exports = {
                     number_of_tickets
                 });
 
-            await deleteReplyInteractionAfterSeconds(interaction, res.data, 5000);
+            await deleteReplyInteractionAfterSeconds(interaction, res.data, 5);
             // await interaction.reply({ content: res.data, ephemeral: true });
         }
 
         catch (e){
             //console.log(e);
-            await deleteReplyInteractionAfterSeconds(interaction, "Error adding tickets!", 5000);
+            await deleteReplyInteractionAfterSeconds(interaction, "Error adding tickets!", 5);
             // await interaction.reply({ content: "Error adding tickets!", ephemeral: true });
         }
 	},

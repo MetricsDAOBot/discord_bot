@@ -35,7 +35,7 @@ client.on(Events.InteractionCreate, async interaction => {
 		await command.execute(interaction);
 	} catch (error) {
 		console.error(error);
-		await deleteReplyInteractionAfterSeconds(interaction, 'There was an error while executing this command!', 5000);
+		await deleteReplyInteractionAfterSeconds(interaction, 'There was an error while executing this command!', 5);
 		// await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
 	}
 });
@@ -65,12 +65,12 @@ client.on(Events.InteractionCreate, async interaction => {
 		});
 
 		if(!isValidUUID(res.data)) {
-			await deleteReplyInteractionAfterSeconds(interaction, res.data, 5000);
+			await deleteReplyInteractionAfterSeconds(interaction, res.data, 5);
 			// await interaction.reply({ content: res.data, ephemeral: true });
 			return;
 		}
 
-		await deleteReplyInteractionAfterSeconds(interaction, 'Your submission was received successfully!', 5000);
+		await deleteReplyInteractionAfterSeconds(interaction, 'Your submission was received successfully!', 5);
 		// await interaction.reply({ content: 'Your submission was received successfully!', ephemeral: true });
 	}
 
@@ -94,7 +94,7 @@ client.on(Events.InteractionCreate, async interaction => {
 		});
 
 		if(res.data !== "Updated") {
-			await deleteReplyInteractionAfterSeconds(interaction, res.data, 5000);
+			await deleteReplyInteractionAfterSeconds(interaction, res.data, 5);
 			// await interaction.reply({ content: res.data, ephemeral: true });
 			return;
 		}
@@ -110,7 +110,7 @@ client.on(Events.InteractionCreate, async interaction => {
 		let uuid = interaction.customId.replace('regrade_', '');
 
 		if(!isValidUUID(uuid)) {
-			await deleteReplyInteractionAfterSeconds(interaction, "Invalid submission", 5000);
+			await deleteReplyInteractionAfterSeconds(interaction, "Invalid submission", 5);
 			// await interaction.reply({ content: "Invalid submission", ephemeral: true });
 			return;
 		}
@@ -175,7 +175,7 @@ client.on(Events.InteractionCreate, async interaction => {
 				});
 
 				if(res.data !== "Approved") {
-					await deleteReplyInteractionAfterSeconds(interaction, res.data, 5000);
+					await deleteReplyInteractionAfterSeconds(interaction, res.data, 5);
 					// await interaction.reply({ content: res.data, ephemeral: true });
 					return;
 				}
@@ -194,7 +194,7 @@ client.on(Events.InteractionCreate, async interaction => {
 			});
 
 			if(typeof res.data === "string") {
-				await deleteReplyInteractionAfterSeconds(interaction, res.data, 5000);
+				await deleteReplyInteractionAfterSeconds(interaction, res.data, 5);
 				// await interaction.reply({ content: res.data, ephemeral: true });
 				return;
 			}
@@ -221,7 +221,7 @@ client.on(Events.InteractionCreate, async interaction => {
 				}
 
 				else {
-					await deleteReplyInteractionAfterSeconds(interaction, "No pending approvals.", 5000);
+					await deleteReplyInteractionAfterSeconds(interaction, "No pending approvals.", 5);
 					// await interaction.reply({ content: "No pending approvals.", ephemeral: true });
 				}
 				return;
@@ -266,7 +266,7 @@ client.on(Events.InteractionCreate, async interaction => {
 
 		catch (e){
 			console.log(e);
-			await deleteReplyInteractionAfterSeconds(interaction, "Unable to get pending approvals.", 5000);
+			await deleteReplyInteractionAfterSeconds(interaction, "Unable to get pending approvals.", 5);
 			// await interaction.reply({ content: "Unable to get pending approvals.", ephemeral: true });
 		}
 	}
@@ -279,13 +279,13 @@ client.on(Events.InteractionCreate, async interaction => {
 			let res = await axios.get<any, AxiosResponse<RegradeRequest[] | string>>(`/regrade_requests/${user.id}/${page}`);
 
 			if(typeof res.data === "string") {
-				await deleteReplyInteractionAfterSeconds(interaction, res.data, 5000);
+				await deleteReplyInteractionAfterSeconds(interaction, res.data, 5);
 				// await interaction.reply({ content: res.data, ephemeral: true });
 				return;
 			}
 
 			if(res.data.length === 0) {
-				await deleteReplyInteractionAfterSeconds(interaction, "You have no requests.", 5000);
+				await deleteReplyInteractionAfterSeconds(interaction, "You have no requests.", 5);
 				// await interaction.reply({ content: "You have no requests.", ephemeral: true });
 				return;
 			}
@@ -331,7 +331,7 @@ client.on(Events.InteractionCreate, async interaction => {
 
 		catch (e){
 			console.log(e);
-			await deleteReplyInteractionAfterSeconds(interaction, "Unable to get pending approvals.", 5000);
+			await deleteReplyInteractionAfterSeconds(interaction, "Unable to get pending approvals.", 5);
 			//await interaction.reply({ content: "Unable to get pending approvals.", ephemeral: true });
 		}
 	}

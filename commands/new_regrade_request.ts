@@ -14,7 +14,7 @@ module.exports = {
 
 			// if new regrade request is added, it's gonna be a uuid
 			if(res.data === 0) {
-				await deleteReplyInteractionAfterSeconds(interaction, "You're out of Golden Tickets.", 5000);
+				await deleteReplyInteractionAfterSeconds(interaction, "You're out of Golden Tickets.", 5);
 				// await interaction.reply({ content: "You're out of Golden Tickets.", ephemeral: true });
 				return;
 			}
@@ -85,7 +85,7 @@ module.exports = {
 
         catch (e){
             //console.log(e);
-            await deleteReplyInteractionAfterSeconds(interaction, "Error adding new request!", 5000);
+            await deleteReplyInteractionAfterSeconds(interaction, "Error adding new request!", 5);
             // await interaction.reply({ content: "Error adding new request!", ephemeral: true });
         }
 	},

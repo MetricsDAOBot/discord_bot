@@ -15,7 +15,7 @@ module.exports = {
             let res = await axios.post<any, AxiosResponse<RegradeRequestCSV[]>>(`/regrade_requests`, { discord_id: user.id });
             
 			if(res.data.length === 0) {
-				await deleteReplyInteractionAfterSeconds(interaction, "There are no requests.", 5000);
+				await deleteReplyInteractionAfterSeconds(interaction, "There are no requests.", 5);
 				// await interaction.reply({ content: "You have no requests.", ephemeral: true });
 				return;
 			}
@@ -45,7 +45,7 @@ module.exports = {
 
         catch (e){
             //console.log(e);
-            await deleteReplyInteractionAfterSeconds(interaction,"Error adding tickets!", 5000);
+            await deleteReplyInteractionAfterSeconds(interaction,"Error adding tickets!", 5);
             // await interaction.reply({ content: "Error adding tickets!", ephemeral: true });
         }
 	},
