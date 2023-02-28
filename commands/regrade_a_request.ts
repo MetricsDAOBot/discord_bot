@@ -47,7 +47,7 @@ module.exports = {
 
 			const button = new ButtonBuilder()
 								.setCustomId(`regrade_${ret.uuid}`) // split it when processing interaction
-								.setLabel('Review!')
+								.setLabel('Review')
 								.setStyle(ButtonStyle.Primary);
 
 			const actionRow = new ActionRowBuilder().addComponents(button) as any;

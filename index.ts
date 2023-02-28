@@ -1,4 +1,4 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Events, GatewayIntentBits, ModalBuilder, TextInputBuilder, TextInputStyle } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Events, GatewayIntentBits, ModalBuilder, TextChannel, TextInputBuilder, TextInputStyle } from 'discord.js';
 import { CustomClient } from './utils/CustomClient';
 import 'dotenv/config';
 import axios from './services/axios';
@@ -70,6 +70,10 @@ client.on(Events.InteractionCreate, async interaction => {
 			return;
 		}
 
+		if(interaction?.channel?.id) {
+			await (client.channels.cache.get(interaction.channel.id) as TextChannel).send(`New request received from ${user.username}.`);
+		}
+
 		await deleteReplyInteractionAfterSeconds(interaction, 'Your submission was received successfully!', 5);
 		// await interaction.reply({ content: 'Your submission was received successfully!', ephemeral: true });
 	}
@@ -99,7 +103,14 @@ client.on(Events.InteractionCreate, async interaction => {
 			return;
 		}
 
-		await interaction.reply({ content: 'Your review was received successfully!', ephemeral: true });
+		let request = await axios.get<RegradeRequest[]>(`/regrade_request/${uuid}`);
+
+		if(interaction?.channel?.id && request.data[0]?.uuid) {
+			await (client.channels.cache.get(interaction.channel.id) as TextChannel).send(`${request.data[0].submission} has been reviewed.`);
+		}
+
+		await deleteReplyInteractionAfterSeconds(interaction, 'Your review was received successfully!', 5);
+		//await interaction.reply({ content: 'Your review was received successfully!', ephemeral: true });
 	}
 });
 
@@ -153,7 +164,7 @@ client.on(Events.InteractionCreate, async interaction => {
 	}
 
 	// pending approvals
-	else if (interaction.customId.includes('nav_approval_') || interaction.customId.includes('approve_')) {
+	else if (interaction.customId.includes('nav_approval_') || interaction.customId.includes('approve_') || interaction.customId.includes('reject_')) {
 		try {
 			let { user } = interaction;
 			let page = interaction.customId.includes('nav_approval_')? 
@@ -162,7 +173,7 @@ client.on(Events.InteractionCreate, async interaction => {
 
 			let approveButtonEnabled = true;
 			let approveButtonText = "Approve";
-			let isApprove = false;
+			let isApprovalOperation = false;
 
 			// approve the review
 			if(interaction.customId.includes('approve_')) {
@@ -181,10 +192,46 @@ client.on(Events.InteractionCreate, async interaction => {
 				}
 
 				else {
+					let request = await axios.get<RegradeRequest[]>(`/regrade_request/${uuid}`);
+
+					if(interaction?.channel?.id && request.data[0]?.uuid) {
+						await (client.channels.cache.get(interaction.channel.id) as TextChannel).send(`${request.data[0].submission}'s regraded score has been approved.\n\`\`\`Old Score: ${request.data[0].current_score}\nNew Score: ${request.data[0].regraded_score}\`\`\``);
+					}
+
 					//decrease one page to not overflow
 					page--;
 					page = page < 0? 0 : page;
-					isApprove = true;
+					isApprovalOperation = true;
+				}
+			}
+
+			// reject the review
+			if(interaction.customId.includes('reject_')) {
+				let uuid = interaction.customId.split('_')[2];
+				console.log('rejecting');
+				let res = await axios.post<any, AxiosResponse<string>>('/reject_regrade_request', {
+					discord_id: user.id,
+					discord_name: `${user.username}#${user.discriminator}`,
+					uuid,
+				});
+
+				if(res.data !== "Rejected") {
+					await deleteReplyInteractionAfterSeconds(interaction, res.data, 5);
+					// await interaction.reply({ content: res.data, ephemeral: true });
+					return;
+				}
+
+				else {
+					let request = await axios.get<RegradeRequest[]>(`/regrade_request/${uuid}`);
+
+					if(interaction?.channel?.id && request.data[0]?.uuid) {
+						await (client.channels.cache.get(interaction.channel.id) as TextChannel).send(`${request.data[0].submission}'s regraded score has been rejected.`);
+					}
+
+					//decrease one page to not overflow
+					page--;
+					page = page < 0? 0 : page;
+					isApprovalOperation = true;
 				}
 			}
 
@@ -216,7 +263,7 @@ client.on(Events.InteractionCreate, async interaction => {
 
 
 			if(res.data.length === 0) {
-				if(isApprove) {
+				if(isApprovalOperation) {
 					await interaction.update({ content: "No more pending approvals.", embeds: [], components: [] });
 				}
 
@@ -233,6 +280,12 @@ client.on(Events.InteractionCreate, async interaction => {
 								.setCustomId(`approve_${page}_${ret.uuid}`) // split it when processing interaction
 								.setLabel(approveButtonText)
 								.setStyle(ButtonStyle.Success)
+								.setDisabled(!approveButtonEnabled);
+
+			const button4 = new ButtonBuilder()
+								.setCustomId(`reject_${page}_${ret.uuid}`) // split it when processing interaction
+								.setLabel(approveButtonText)
+								.setStyle(ButtonStyle.Danger)
 								.setDisabled(!approveButtonEnabled);
 
 			// the data size is always 2
@@ -260,7 +313,7 @@ client.on(Events.InteractionCreate, async interaction => {
 									{ name: 'Regraded At', value: moment(ret.regraded_at).format('YYYY-MM-DD HH:mm:ss') },
 								);
 
-			actionRow = new ActionRowBuilder().addComponents(button1, button2, button3) as any;
+			actionRow = new ActionRowBuilder().addComponents(button1, button2, button4, button3) as any;
 			await interaction.update({ embeds: [dashboardEmbed], components: [actionRow] });
 		}
 

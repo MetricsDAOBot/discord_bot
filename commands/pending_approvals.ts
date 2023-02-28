@@ -64,6 +64,11 @@ module.exports = {
 								.setLabel('Approve')
 								.setStyle(ButtonStyle.Success);
 
+			const button4 = new ButtonBuilder()
+								.setCustomId(`reject_0_${ret.uuid}`) // split it when processing interaction
+								.setLabel('Reject')
+								.setStyle(ButtonStyle.Danger);
+
 			const button3 = new ButtonBuilder()
 								.setCustomId(`nav_approval_1`) // split it when processing interaction
 								.setLabel('>')
@@ -72,7 +77,7 @@ module.exports = {
 								// less than 2 = no more data
 								.setDisabled(res.data.length < 2);
 
-			const actionRow = new ActionRowBuilder().addComponents(button1, button2, button3) as any;
+			const actionRow = new ActionRowBuilder().addComponents(button1, button2, button4, button3) as any;
 
 			await interaction.reply({ embeds: [dashboardEmbed], components: [actionRow], ephemeral: true });
 		}

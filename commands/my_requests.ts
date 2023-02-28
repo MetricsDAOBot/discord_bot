@@ -73,6 +73,11 @@ module.exports = {
 								.setStyle(ButtonStyle.Primary)
 								.setDisabled(true);
 
+			/* const button2 = new ButtonBuilder()
+								.setCustomId(`remove_self_0_${ret.uuid}`) // split it when processing interaction
+								.setLabel('Remove')
+								.setStyle(ButtonStyle.Danger); */
+
 			const button3 = new ButtonBuilder()
 								.setCustomId(`nav_self_1`) // split it when processing interaction
 								.setLabel('>')
