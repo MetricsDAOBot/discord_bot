@@ -36,23 +36,37 @@ module.exports = {
 								.setTitle("Review This Dashboard")
 								.setDescription('Click the review button once you\'re done.')
 								.addFields(
-									{ name: 'Submission', value: ret.submission ?? "null" },
-									{ name: 'Current Score', value: ret.current_score?.toString() ?? 'null' },
-									{ name: 'Expected Score', value: ret.expected_score?.toString() ?? 'null' },
-									{ name: 'Reason', value: ret.reason ?? "null" },
-									{ name: 'Grader Feedback', value: ret.grader_feedback ?? "null" },
+									{ name: '\u200B', value: '\u200B' },
+									{ name: 'Submission', value: ret.submission ?? 'N/A' },
+									{ name: 'Current Score', value: ret.current_score?.toString() ?? 'N/A' },
+									{ name: 'Expected Score', value: ret.expected_score?.toString() ?? 'N/A' },
+									// { name: 'Reason', value: ret.reason ?? 'N/A' },
+									// { name: 'Grader Feedback', value: ret.grader_feedback ?? 'N/A' },
 									{ name: '\u200B', value: '\u200B' },
 									{ name: 'Submitted At', value: moment(ret.created_at).format('YYYY-MM-DD HH:mm:ss') },
 								);
+			
 
 			const button = new ButtonBuilder()
 								.setCustomId(`regrade_${ret.uuid}`) // split it when processing interaction
 								.setLabel('Review')
 								.setStyle(ButtonStyle.Primary);
 
-			const actionRow = new ActionRowBuilder().addComponents(button) as any;
+			const buttonReason = new ButtonBuilder()
+								.setCustomId(`reason_-1_${ret.uuid}`) // split it when processing interaction
+								.setLabel('Request Reason')
+								.setStyle(ButtonStyle.Secondary)
+								.setDisabled(!ret.reason);
 
-			await interaction.reply({ embeds: [dashboardEmbed], components: [actionRow], ephemeral: true });
+			const buttonFeedback = new ButtonBuilder()
+								.setCustomId(`feedback_-1_${ret.uuid}`) // split it when processing interaction
+								.setLabel('Grader Feedback')
+								.setStyle(ButtonStyle.Secondary)
+								.setDisabled(!ret.grader_feedback);
+
+			const actionRow = new ActionRowBuilder().addComponents(button, buttonReason, buttonFeedback) as any;
+
+			await interaction.reply({ /* content: replyMessage, */embeds: [dashboardEmbed], components: [actionRow], ephemeral: true });
 		}
 
 		catch (e){

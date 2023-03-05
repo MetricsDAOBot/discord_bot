@@ -38,19 +38,19 @@ module.exports = {
 								.setTitle("Pending Approvals")
 								.setDescription('Click the approve button if you\'re satisfied.')
 								.addFields(
-									{ name: 'Submission', value: ret.submission ?? "null" },
-									{ name: 'Current Score', value: ret.current_score?.toString() ?? 'null' },
-									{ name: 'Expected Score', value: ret.expected_score?.toString() ?? 'null' },
-									{ name: 'Reason', value: ret.reason ?? "null" },
+									{ name: 'Submission', value: ret.submission ?? 'N/A' },
 									{ name: '\u200B', value: '\u200B' },
-									{ name: 'Regraded Score', value: ret.regraded_score?.toString() ?? "null" },
-									{ name: 'Regraded Reason', value: ret.regraded_reason ?? "null" },
+									{ name: 'Current Score', value: ret.current_score?.toString() ?? 'N/A' },
+									{ name: 'Expected Score', value: ret.expected_score?.toString() ?? 'N/A' },
+									//{ name: 'Reason', value: ret.reason ?? 'N/A' },
+									{ name: 'Regraded Score', value: ret.regraded_score?.toString() ?? 'N/A' },
+									//{ name: 'Regraded Reason', value: ret.regraded_reason ?? 'N/A' },
 									{ name: '\u200B', value: '\u200B' },
-									{ name: 'Submitted By', value: ret.discord_name },
-									{ name: 'Submitted At', value: moment(ret.created_at).format('YYYY-MM-DD HH:mm:ss') },
+									{ name: 'Submitted By', value: ret.discord_name, inline: true },
+									{ name: 'Submitted At', value: moment(ret.created_at).format('YYYY-MM-DD HH:mm:ss'), inline: true },
 									{ name: '\u200B', value: '\u200B' },
-									{ name: 'Regraded By', value: ret.regraded_by ?? "null" },
-									{ name: 'Regraded At', value: moment(ret.regraded_at).format('YYYY-MM-DD HH:mm:ss') },
+									{ name: 'Regraded By', value: ret.regraded_by ?? 'N/A', inline: true },
+									{ name: 'Regraded At', value: moment(ret.regraded_at).format('YYYY-MM-DD HH:mm:ss'), inline: true },
 								);
 
 			const button1 = new ButtonBuilder()
@@ -69,6 +69,24 @@ module.exports = {
 								.setLabel('Reject')
 								.setStyle(ButtonStyle.Danger);
 
+			const buttonRegradeReason = new ButtonBuilder()
+								.setCustomId(`reason_-1_${ret.uuid}`) // split it when processing interaction
+								.setLabel('Request Reason')
+								.setStyle(ButtonStyle.Secondary)
+								.setDisabled(!ret.reason);
+
+			const buttonReason = new ButtonBuilder()
+								.setCustomId(`reasonregraded_-1_${ret.uuid}`) // split it when processing interaction
+								.setLabel('Regrader Feedback')
+								.setStyle(ButtonStyle.Secondary)
+								.setDisabled(!ret.regraded_reason);
+
+			const buttonFeedback = new ButtonBuilder()
+								.setCustomId(`feedback_-1_${ret.uuid}`) // split it when processing interaction
+								.setLabel('Grader Feedback')
+								.setStyle(ButtonStyle.Secondary)
+								.setDisabled(!ret.grader_feedback);
+
 			const button3 = new ButtonBuilder()
 								.setCustomId(`nav_approval_1`) // split it when processing interaction
 								.setLabel('>')
@@ -78,8 +96,9 @@ module.exports = {
 								.setDisabled(res.data.length < 2);
 
 			const actionRow = new ActionRowBuilder().addComponents(button1, button2, button4, button3) as any;
+			const actionRow2 = new ActionRowBuilder().addComponents(buttonRegradeReason, buttonReason, buttonFeedback) as any;
 
-			await interaction.reply({ embeds: [dashboardEmbed], components: [actionRow], ephemeral: true });
+			await interaction.reply({ embeds: [dashboardEmbed], components: [actionRow, actionRow2], ephemeral: true });
 		}
 
 		catch (e){

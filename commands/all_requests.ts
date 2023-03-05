@@ -36,7 +36,7 @@ module.exports = {
                 }
             });
             let buffer = Buffer.from(ret);
-            let attachment = new AttachmentBuilder(buffer, { name: 'my_requests.csv' });
+            let attachment = new AttachmentBuilder(buffer, { name: 'all_requests.csv' });
             await interaction.reply({ files: [attachment], ephemeral: true });
             await sleep(30000);
             await interaction.deleteReply();
