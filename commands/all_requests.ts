@@ -12,7 +12,7 @@ module.exports = {
 	async execute(interaction: ChatInputCommandInteraction<CacheType>) {
         try {
 			let { user } = interaction;
-            let res = await axios.post<any, AxiosResponse<RegradeRequestCSV[]>>(`/regrade_requests`, { discord_id: user.id });
+            let res = await axios.post<RegradeRequestCSV[]>(`/regrade_requests`, { discord_id: user.id });
             
 			if(res.data.length === 0) {
 				await deleteReplyInteractionAfterSeconds(interaction, "There are no requests.", 5);
@@ -45,7 +45,7 @@ module.exports = {
 
         catch (e){
             //console.log(e);
-            await deleteReplyInteractionAfterSeconds(interaction,"Error adding tickets!", 5);
+            await deleteReplyInteractionAfterSeconds(interaction,"Error getting all requests!", 5);
             // await interaction.reply({ content: "Error adding tickets!", ephemeral: true });
         }
 	},
