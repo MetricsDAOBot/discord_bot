@@ -38,18 +38,18 @@ module.exports = {
 								.setTitle("Pending Approvals")
 								.setDescription('Click the approve button if you\'re satisfied.')
 								.addFields(
-									{ name: 'Submission', value: ret.submission ?? 'N/A' },
+									{ name: 'Submission', value: ret.submission? ret.submission : 'N/A' },
 									{ name: '\u200B', value: '\u200B' },
-									{ name: 'Current Score', value: ret.current_score?.toString() ?? 'N/A' },
-									{ name: 'Expected Score', value: ret.expected_score?.toString() ?? 'N/A' },
+									{ name: 'Current Score', value: ret.current_score? ret.current_score.toString() : 'N/A' },
+									{ name: 'Expected Score', value: ret.expected_score? ret.expected_score.toString() : 'N/A' },
 									//{ name: 'Reason', value: ret.reason ?? 'N/A' },
-									{ name: 'Regraded Score', value: ret.regraded_score?.toString() ?? 'N/A' },
+									{ name: 'Regraded Score', value: ret.regraded_score? ret.regraded_score.toString() : 'N/A' },
 									//{ name: 'Regraded Reason', value: ret.regraded_reason ?? 'N/A' },
 									{ name: '\u200B', value: '\u200B' },
 									{ name: 'Submitted By', value: ret.discord_name, inline: true },
 									{ name: 'Submitted At', value: moment(ret.created_at).format('YYYY-MM-DD HH:mm:ss'), inline: true },
 									{ name: '\u200B', value: '\u200B' },
-									{ name: 'Regraded By', value: ret.regraded_by ?? 'N/A', inline: true },
+									{ name: 'Regraded By', value: ret.regraded_by? ret.regraded_by : 'N/A', inline: true },
 									{ name: 'Regraded At', value: moment(ret.regraded_at).format('YYYY-MM-DD HH:mm:ss'), inline: true },
 								);
 

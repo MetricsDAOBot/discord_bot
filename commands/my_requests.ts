@@ -55,12 +55,12 @@ module.exports = {
 								.setColor(0x0099FF)
 								.setTitle(`${user.username}'s Requests`)
 								.addFields(
-									{ name: 'Submission', value: ret.submission ?? 'N/A' },
-									{ name: 'Current Score', value: ret.current_score?.toString() ?? 'N/A' },
-									{ name: 'Expected Score', value: ret.expected_score?.toString() ?? 'N/A' },
+									{ name: 'Submission', value: ret.submission? ret.submission : 'N/A' },
+									{ name: 'Current Score', value: ret.current_score? ret.current_score.toString() : 'N/A' },
+									{ name: 'Expected Score', value: ret.expected_score? ret.expected_score.toString() : 'N/A' },
 									//{ name: 'Reason', value: ret.reason ?? 'N/A' },
 									{ name: '\u200B', value: '\u200B' },
-									{ name: 'Regraded Score', value: ret.regraded_score?.toString() ?? "Not Regraded Yet" },
+									{ name: 'Regraded Score', value: ret.regraded_score? ret.regraded_score.toString() : "Not Regraded Yet" },
 									//{ name: 'Regraded Reason', value: ret.regraded_reason ?? "Not Regraded Yet" },
 									{ name: '\u200B', value: '\u200B' },
 								)

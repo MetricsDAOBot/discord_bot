@@ -30,6 +30,9 @@ module.exports = {
 				return;
 			}
 
+			let submission = ret.submission? ret.submission : 'N/A';
+			let current_score = ret.current_score? ret.current_score.toString() : 'N/A';
+
 			// inside a command, event listener, etc.
 			const dashboardEmbed = new EmbedBuilder()
 								.setColor(0x0099FF)
@@ -37,9 +40,9 @@ module.exports = {
 								.setDescription('Click the review button once you\'re done.')
 								.addFields(
 									{ name: '\u200B', value: '\u200B' },
-									{ name: 'Submission', value: ret.submission ?? 'N/A' },
-									{ name: 'Current Score', value: ret.current_score?.toString() ?? 'N/A' },
-									{ name: 'Expected Score', value: ret.expected_score?.toString() ?? 'N/A' },
+									{ name: 'Submission', value: ret.submission? ret.submission : 'N/A' },
+									{ name: 'Current Score', value: ret.current_score? ret.current_score.toString() : 'N/A' },
+									{ name: 'Expected Score', value: ret.expected_score? ret.expected_score.toString() : 'N/A' },
 									// { name: 'Reason', value: ret.reason ?? 'N/A' },
 									// { name: 'Grader Feedback', value: ret.grader_feedback ?? 'N/A' },
 									{ name: '\u200B', value: '\u200B' },
