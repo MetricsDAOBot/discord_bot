@@ -66,7 +66,7 @@ module.exports = {
                     return;
                 }
 
-                ret += `\n${currentLength}. ${discord_name}'s ${submission} (${status})`;
+                ret += `\n${currentLength}. ${discord_name}'s <${submission}> (${status})`;
                 currentLength++;
             });
 
