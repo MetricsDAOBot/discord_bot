@@ -430,7 +430,7 @@ client.on(Events.InteractionCreate, async interaction => {
 	// when requesting for feedback 
 	else if (interaction.customId.includes('feedback_') || interaction.customId.includes('reason_') || interaction.customId.includes('reasonregraded_')) {
 		let [type, pageStr, uuid] = interaction.customId.split("_");
-		console.log({pageStr});
+
 		let request = await axios.get<RegradeRequest[]>(`/regrade_request/${uuid}`);
 		let page = parseInt(pageStr);
 		page = page < 0? 0 : page;
