@@ -3,10 +3,12 @@ import { SlashCommandBuilder } from'discord.js';
 import axios from '../services/axios';
 import { deleteReplyInteractionAfterSeconds, sleep } from "../utils/common";
 import { RegradeRequestCSV } from "./types";
+import 'dotenv/config';
 
 const OPEN_FOR_REVIEW = 0;
 const REVIEW_IN_PROGRESS = 1;
 const PENDING_APPROVAL = 2;
+const DISCORD_GUILD_ID = process.env.DISCORD_GUILD_ID;
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -36,7 +38,7 @@ module.exports = {
             let currentLength = 1;
 
             res.data.forEach((request, index) => {
-                const {discord_name, created_at, updated_at, regraded_at, approved_at, uuid, is_regrading, submission, grader_feedback, current_score, expected_score, reason, regraded_score, regraded_reason, regraded_by} = request;
+                const {discord_name, created_at, updated_at, regraded_at, approved_at, uuid, is_regrading, submission, grader_feedback, current_score, expected_score, reason, regraded_score, regraded_reason, regraded_by, thread_id} = request;
                 let status = "Open for Review";
 
                 if(approved_at) {
@@ -65,7 +67,7 @@ module.exports = {
                     return;
                 }
 
-                ret += `\n${currentLength}. ${discord_name}'s <${submission}> (${status})`;
+                ret += `\n${currentLength}. ${discord_name}'s <https://discord.com/channels/${DISCORD_GUILD_ID}/${request.thread_id}> (${status})`;
                 currentLength++;
             });
 

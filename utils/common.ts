@@ -1,7 +1,10 @@
 import { ButtonInteraction, ChatInputCommandInteraction, ForumChannel, ModalSubmitInteraction, TextChannel, ThreadChannel } from 'discord.js';
 import 'dotenv/config';
 import { DISCORD_COMMUNITY_FORUM_ID, PAGE_CHAR_LENGTH } from '..';
+import { RegradeRequest } from '../commands/types';
 import { CustomClient } from './CustomClient';
+import { DashboardBuilder } from './DashboardBuilder';
+import axios from '../services/axios';
 
 // check if the uuid is valid as sanitization
 export const isValidUUID = (uuid: string) => {
@@ -82,5 +85,53 @@ export const updateTags = async(client: CustomClient, threadId: string, tagName:
     if(remark) {
         await thread.send(remark);
     }
+    return;
+}
+
+export const newThread = async(client: CustomClient, request: RegradeRequest) => {
+    let channel = client.channels.cache.get(DISCORD_COMMUNITY_FORUM_ID) as ForumChannel;
+
+    let title = `[${request.blockchain ?? "N/A"}] ${request.bounty_name ?? "Review Request"} (${request.discord_name})`;
+    let message = `Submitted by <@${request.discord_id}>`;
+
+    let dashboardBuilder = new DashboardBuilder(request, "Request Details");
+    dashboardBuilder
+        .disableRegrader()
+        .disableThread();
+    let dashboard = dashboardBuilder.buildDashboard();
+
+    //search for tag
+    let tagName = "Open";
+
+    if(request.approved_at) {
+        tagName = "Closed";
+        return;
+    }
+
+    else if(request.regraded_score) {
+        tagName = "Pending Approval";
+    }
+
+    else if(request.is_regrading) {
+        tagName = "Reviewing";
+    }
+
+    let tags = channel.availableTags.filter(x => x.name === tagName);
+    const thread = await channel.threads.create({
+        name: title,
+        message: {
+            content: message,
+            embeds: [dashboard],
+        },
+        appliedTags: tags.length === 0? undefined : tags.map(x => x.id)
+    });
+
+    // log the thread id in backend
+    await axios.post('/assign_regrade_request_thread_id', { uuid: request.uuid, thread_id: thread.id, first_message_id: thread.lastMessageId });
+
+    if(request.reason) await sendMessageInParts(thread, "Request Reason", request.reason);
+    if(request.grader_feedback) await sendMessageInParts(thread, "Original Feedback", request.grader_feedback);
+    if(request.regraded_reason) await sendMessageInParts(thread, "Regrade Feedback", request.regraded_reason);
+
     return;
 }

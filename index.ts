@@ -2,7 +2,7 @@ import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Events, For
 import { CustomClient } from './utils/CustomClient';
 import 'dotenv/config';
 import axios from './services/axios';
-import { deleteReplyInteractionAfterSeconds, isValidUUID, updateTags } from './utils/common';
+import { deleteReplyInteractionAfterSeconds, isValidUUID, newThread, updateTags } from './utils/common';
 import { RegradeRequest } from './commands/types';
 import { DashboardBuilder } from './utils/DashboardBuilder';
 
@@ -17,6 +17,9 @@ const client = new CustomClient({intents: [
 ]});
 export const PAGE_CHAR_LENGTH = 1900;
 
+//temp cache for new requests
+let newRequests: {[userId: string] : { blockchain: string, bounty_name: string }} = {};
+
 client.on(Events.MessageCreate, function(message) {
     if (message.author.bot) return;
 });
@@ -25,6 +28,7 @@ client.on(Events.MessageCreate, function(message) {
 client.on(Events.InteractionCreate, async interaction => {
 	if (!interaction.isChatInputCommand()) return;
 
+	const {user} = interaction;
     const interactionClient = (interaction.client as CustomClient);
 	const command = interactionClient.commands.get(interaction.commandName);
 
@@ -34,7 +38,11 @@ client.on(Events.InteractionCreate, async interaction => {
 	}
 
 	try {
-		await command.execute(interaction, client);
+		let ret = await command.execute(interaction, client);
+		if(ret && interaction.commandName === "new_regrade_request") {
+			let { blockchain, bounty_name } = ret;
+			newRequests[user.id] = { blockchain, bounty_name };
+		} 
 	} catch (error) {
 		console.error(error);
 		await deleteReplyInteractionAfterSeconds(interaction, 'There was an error while executing this command!', 5);
@@ -50,15 +58,24 @@ client.on(Events.InteractionCreate, async interaction => {
 
 	//new requests
 	if (interaction.customId === 'new_regrade_request') {
+		if(!newRequests[user.id]) {
+			await deleteReplyInteractionAfterSeconds(interaction, "E01: Error adding new request.", 5);
+			return;
+		}
+		let { blockchain, bounty_name } = newRequests[user.id];
 		const submission = (interaction.fields.getField('submission') as any).value;
 		const current_score = (interaction.fields.getField('current_score') as any).value;
 		const expected_score = (interaction.fields.getField('expected_score') as any).value;
 		const grader_feedback = (interaction.fields.getField('grader_feedback') as any).value;
 		const reason = (interaction.fields.getField('reason') as any).value;
 
+		let discord_name = `${user.username}#${user.discriminator}`;
+
 		let res = await axios.post('/regrade_request', {
 			discord_id: user.id,
-			discord_name: `${user.username}#${user.discriminator}`,
+			discord_name,
+			blockchain,
+			bounty_name,
 			submission,
 			current_score,
 			expected_score,
@@ -76,8 +93,16 @@ client.on(Events.InteractionCreate, async interaction => {
 			await (client.channels.cache.get(interaction.channel.id) as TextChannel).send(`New request received from ${user.username}.`);
 		}
 
+		// get uuid
+		let requests = await axios.get<RegradeRequest[]>(`/regrade_request/${res.data}`);
+		for(const request of requests.data) {
+			await newThread(client, request);
+		}
+
 		await deleteReplyInteractionAfterSeconds(interaction, 'Your submission was received successfully!', 5);
-		// await interaction.reply({ content: 'Your submission was received successfully!', ephemeral: true });
+
+		//remove cache
+		delete newRequests[user.id];
 	}
 
 	else if (interaction.customId.includes('review_')) {

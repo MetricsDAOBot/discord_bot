@@ -6,7 +6,15 @@ import { deleteReplyInteractionAfterSeconds, isValidUUID } from "../utils/common
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('new_regrade_request')
-		.setDescription('Adds a new regrade request!'),
+		.setDescription('Adds a new regrade request!')
+		.addStringOption(option =>
+			option.setName('blockchain')
+				.setDescription('Blockchain')
+                .setRequired(true))
+		.addStringOption(option =>
+			option.setName('bounty_name')
+				.setDescription('Name of the bounty')
+                .setRequired(true)),
 	async execute(interaction: ChatInputCommandInteraction<CacheType>) {
         try {
             let {user} = interaction;
@@ -15,19 +23,28 @@ module.exports = {
 			// if new regrade request is added, it's gonna be a uuid
 			if(res.data === 0) {
 				await deleteReplyInteractionAfterSeconds(interaction, "You're out of Golden Tickets.", 5);
-				// await interaction.reply({ content: "You're out of Golden Tickets.", ephemeral: true });
+				return;
+			}
+
+			let blockchain = interaction.options.getString('blockchain');
+			let bounty_name = interaction.options.getString('bounty_name');
+
+			if(!blockchain) {
+				await deleteReplyInteractionAfterSeconds(interaction, "Blockchain not set.", 5);
+				return;
+			}
+			if(!bounty_name) {
+				await deleteReplyInteractionAfterSeconds(interaction, "Bounty name not set.", 5);
 				return;
 			}
 
 			// After creating a new regrade request, ask user to update it
 			// Create the modal
 			const modal = new ModalBuilder()
-			.setCustomId('new_regrade_request')
-			.setTitle('New Regrade Request');
+					.setCustomId('new_regrade_request')
+					.setTitle('New Regrade Request');
 
 			// Add components to modal
-
-			// let { discord_id, discord_name, submission, grader_feedback, expected_score, current_score, reason }
 			// Create the text input components
 			const submissionInput = new TextInputBuilder()
 				.setCustomId('submission')
@@ -81,10 +98,11 @@ module.exports = {
 
 			// Show the modal to the user
 			await interaction.showModal(modal);
+			return { blockchain, bounty_name };
         }
 
         catch (e){
-            //console.log(e);
+            console.log(e);
             await deleteReplyInteractionAfterSeconds(interaction, "Error adding new request!", 5);
             // await interaction.reply({ content: "Error adding new request!", ephemeral: true });
         }

@@ -1,7 +1,7 @@
 import { CacheType, ChatInputCommandInteraction, ForumChannel } from "discord.js";
 import { SlashCommandBuilder } from'discord.js';
 import axios from '../services/axios';
-import { deleteReplyInteractionAfterSeconds, sendMessageInParts, sleep } from "../utils/common";
+import { deleteReplyInteractionAfterSeconds, newThread, sendMessageInParts, sleep } from "../utils/common";
 import { CustomClient } from "../utils/CustomClient";
 import 'dotenv/config';
 import { RegradeRequest } from "./types";
@@ -25,50 +25,7 @@ module.exports = {
 
             let count = 0;
             for(const request of requests.data) {
-
-                let channel = client.channels.cache.get(DISCORD_COMMUNITY_FORUM_ID) as ForumChannel;
-
-                let title = `[${request.blockchain ?? "N/A"}] ${request.question ?? "Review Request"} (${request.discord_name})`;
-                let message = `Submitted by <@${request.discord_id}>`;
-
-                let dashboardBuilder = new DashboardBuilder(request, "Request Details");
-                dashboardBuilder
-                    .disableRegrader()
-                    .disableThread();
-                let dashboard = dashboardBuilder.buildDashboard();
-
-                //search for tag
-                let tagName = "Open";
-
-                if(request.approved_at) {
-                    tagName = "Closed";
-                    return;
-                }
-
-                else if(request.regraded_score) {
-                    tagName = "Pending Approval";
-                }
-
-                else if(request.is_regrading) {
-                    tagName = "Reviewing";
-                }
-
-                let tags = channel.availableTags.filter(x => x.name === tagName);
-                const thread = await channel.threads.create({
-                    name: title,
-                    message: {
-                        content: message,
-                        embeds: [dashboard],
-                    },
-                    appliedTags: tags.length === 0? undefined : tags.map(x => x.id)
-                });
-
-                // log the thread id in backend
-                await axios.post('/assign_regrade_request_thread_id', { uuid: request.uuid, thread_id: thread.id });
-
-                if(request.reason) await sendMessageInParts(thread, "Request Reason", request.reason);
-                if(request.grader_feedback) await sendMessageInParts(thread, "Original Feedback", request.grader_feedback);
-                if(request.regraded_reason) await sendMessageInParts(thread, "Regrade Feedback", request.regraded_reason);
+                await newThread(client, request);
                 count++;
             }
 

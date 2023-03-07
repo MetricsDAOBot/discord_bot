@@ -8,8 +8,9 @@ export type RegradeRequest = {
     uuid: string;
 
     blockchain: string | null;
-    question: string | null;
+    bounty_name: string | null;
     thread_id: string | null;
+    first_message_id: string | null;
     submission: string | null;
     grader_feedback: string | null;
     current_score: string | null;
