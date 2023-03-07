@@ -107,8 +107,8 @@ client.on(Events.InteractionCreate, async interaction => {
 
 		let request = await axios.get<RegradeRequest[]>(`/regrade_request/${uuid}`);
 
-		if(interaction?.channel?.id && request.data[0]?.uuid) {
-			await (client.channels.cache.get(interaction.channel.id) as TextChannel).send(`${request.data[0].submission} has been reviewed.`);
+		if(interaction?.channel?.id && request.data[0]?.thread_id) {
+			await (client.channels.cache.get(request.data[0].thread_id) as TextChannel).send(`Request Reviewed`);
 		}
 
 		await deleteReplyInteractionAfterSeconds(interaction, 'Your review was received successfully!', 5);
@@ -194,8 +194,8 @@ client.on(Events.InteractionCreate, async interaction => {
 				else {
 					let request = await axios.get<RegradeRequest[]>(`/regrade_request/${uuid}`);
 
-					if(interaction?.channel?.id && request.data[0]?.uuid) {
-						await (client.channels.cache.get(interaction.channel.id) as TextChannel).send(`${request.data[0].submission}'s regraded score has been approved.\n\`\`\`Old Score: ${request.data[0].current_score}\nNew Score: ${request.data[0].regraded_score}\`\`\``);
+					if(interaction?.channel?.id && request.data[0]?.thread_id) {
+						await (client.channels.cache.get(request.data[0].thread_id) as TextChannel).send(`Request regraded score has been approved.\n\`\`\`Old Score: ${request.data[0].current_score}\nNew Score: ${request.data[0].regraded_score}\`\`\``);
 					}
 
 					//decrease one page to not overflow
@@ -224,8 +224,8 @@ client.on(Events.InteractionCreate, async interaction => {
 				else {
 					let request = await axios.get<RegradeRequest[]>(`/regrade_request/${uuid}`);
 
-					if(interaction?.channel?.id && request.data[0]?.uuid) {
-						await (client.channels.cache.get(interaction.channel.id) as TextChannel).send(`${request.data[0].submission}'s regraded score has been rejected.`);
+					if(interaction?.channel?.id && request.data[0]?.thread_id) {
+						await (client.channels.cache.get(request.data[0].thread_id) as TextChannel).send(`Request's regraded score has been rejected.`);
 					}
 
 					//decrease one page to not overflow

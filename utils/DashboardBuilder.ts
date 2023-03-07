@@ -22,6 +22,7 @@ export class DashboardBuilder {
         disableRegradedAt: false,
         disableSubmittedAt: false,
         disableApprovedAt: false,
+        disableThread: false,
 
         // buttons
         disableRegradeReason: false,
@@ -29,6 +30,7 @@ export class DashboardBuilder {
         disableRegradeFeedback: false,
         enableApprove: false,
         enableReject: false,
+        enableReview: false,
 
         // navigation
         nav_type: "",
@@ -83,6 +85,11 @@ export class DashboardBuilder {
         return this;
     }
 
+    disableThread = () => {
+        this.config.disableThread = true;
+        return this;
+    }
+
     disableRegradeReason = () => {
         this.config.disableRegradeReason = true;
         return this;
@@ -124,6 +131,11 @@ export class DashboardBuilder {
         return this;
     }
 
+    enableReview = () => {
+        this.config.enableReview = true;
+        return this;
+    }
+
     buildDashboard = () => {
         let { request, config, title, description } = this;
         let {
@@ -135,6 +147,7 @@ export class DashboardBuilder {
             disableRegradedAt,
             disableSubmittedAt,
             disableApprovedAt,
+            disableThread
         } = config;
 
         let dashboard = new EmbedBuilder()
@@ -146,6 +159,10 @@ export class DashboardBuilder {
             if(!disableSubmission) {
                 dashboard.addFields(
                     { name: 'Submission', value: request.submission? request.submission : 'N/A' },
+                );
+            }
+            if(!disableThread) {
+                dashboard.addFields(
                     { name: 'Thread', value: request.thread_id? `https://discord.com/channels/${DISCORD_GUILD_ID}/${request.thread_id}` : 'N/A' },
                 );
             }
@@ -218,6 +235,7 @@ export class DashboardBuilder {
             disableRegradeFeedback,
             enableApprove,
             enableReject,
+            enableReview,
     
             // navigation
             nav_type,
@@ -289,6 +307,14 @@ export class DashboardBuilder {
 								.setLabel('Reject')
 								.setStyle(ButtonStyle.Danger);
             lowerButtons.push(buttonReject);
+        }
+
+        if(enableReview) {
+			const buttonReview = new ButtonBuilder()
+            .setCustomId(`regrade_${request.uuid}`) // split it when processing interaction
+            .setLabel('Review')
+            .setStyle(ButtonStyle.Primary);
+            lowerButtons.push(buttonReview);
         }
 
         if(nav_type !== "") {

@@ -30,20 +30,39 @@ module.exports = {
 
                 let channel = client.channels.cache.get(DISCORD_COMMUNITY_FORUM_ID!) as ForumChannel;
 
-                let title = `[${request.blockchain ?? "N/A"}] ${request.question ?? "N/A"} (${request.discord_name})`;
+                let title = `[${request.blockchain ?? "N/A"}] ${request.question ?? "Review Request"} (${request.discord_name})`;
                 let message = `Submitted by <@${request.discord_id}>`;
 
                 let dashboardBuilder = new DashboardBuilder(request, "Request Details");
-                dashboardBuilder.disableRegrader();
-
+                dashboardBuilder
+                    .disableRegrader()
+                    .disableThread();
                 let dashboard = dashboardBuilder.buildDashboard();
 
+                //search for tag
+                let tagName = "Open";
+
+                if(request.approved_at) {
+                    tagName = "Closed";
+                    return;
+                }
+
+                else if(request.regraded_score) {
+                    tagName = "Pending Approval";
+                }
+
+                else if(request.is_regrading) {
+                    tagName = "Reviewing";
+                }
+
+                let tags = channel.availableTags.filter(x => x.name === tagName);
                 const thread = await channel.threads.create({
                     name: title,
                     message: {
                         content: message,
                         embeds: [dashboard],
-                    }
+                    },
+                    appliedTags: tags.length === 0? undefined : tags.map(x => x.id)
                 });
 
                 // log the thread id in backend

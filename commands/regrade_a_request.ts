@@ -4,6 +4,7 @@ import { SlashCommandBuilder } from'discord.js';
 import moment from "moment";
 import axios from '../services/axios';
 import { deleteReplyInteractionAfterSeconds } from "../utils/common";
+import { DashboardBuilder } from "../utils/DashboardBuilder";
 import { RegradeRequest } from "./types";
 
 module.exports = {
@@ -30,46 +31,18 @@ module.exports = {
 				return;
 			}
 
-			let submission = ret.submission? ret.submission : 'N/A';
-			let current_score = ret.current_score? ret.current_score.toString() : 'N/A';
+			let dashboardBuilder = new DashboardBuilder(ret, "Review This Dashboard", 'Click the review button once you\'re done.');
+			dashboardBuilder
+				.enableReview()
+				.disableRegradedAt()
+				.disableApprovedAt();
 
-			// inside a command, event listener, etc.
-			const dashboardEmbed = new EmbedBuilder()
-								.setColor(0x0099FF)
-								.setTitle("Review This Dashboard")
-								.setDescription('Click the review button once you\'re done.')
-								.addFields(
-									{ name: '\u200B', value: '\u200B' },
-									{ name: 'Submission', value: ret.submission? ret.submission : 'N/A' },
-									{ name: 'Current Score', value: ret.current_score? ret.current_score.toString() : 'N/A' },
-									{ name: 'Expected Score', value: ret.expected_score? ret.expected_score.toString() : 'N/A' },
-									// { name: 'Reason', value: ret.reason ?? 'N/A' },
-									// { name: 'Grader Feedback', value: ret.grader_feedback ?? 'N/A' },
-									{ name: '\u200B', value: '\u200B' },
-									{ name: 'Submitted At', value: moment(ret.created_at).format('YYYY-MM-DD HH:mm:ss') },
-								);
-			
+			let {
+				dashboard,
+				actionRows
+			} = dashboardBuilder.buildAll();
 
-			const button = new ButtonBuilder()
-								.setCustomId(`regrade_${ret.uuid}`) // split it when processing interaction
-								.setLabel('Review')
-								.setStyle(ButtonStyle.Primary);
-
-			const buttonReason = new ButtonBuilder()
-								.setCustomId(`reason_-1_${ret.uuid}`) // split it when processing interaction
-								.setLabel('Request Reason')
-								.setStyle(ButtonStyle.Secondary)
-								.setDisabled(!ret.reason);
-
-			const buttonFeedback = new ButtonBuilder()
-								.setCustomId(`feedback_-1_${ret.uuid}`) // split it when processing interaction
-								.setLabel('Grader Feedback')
-								.setStyle(ButtonStyle.Secondary)
-								.setDisabled(!ret.grader_feedback);
-
-			const actionRow = new ActionRowBuilder().addComponents(button, buttonReason, buttonFeedback) as any;
-
-			await interaction.reply({ /* content: replyMessage, */embeds: [dashboardEmbed], components: [actionRow], ephemeral: true });
+			await interaction.reply({ embeds: [dashboard], components: [...actionRows], ephemeral: true });
 		}
 
 		catch (e){
