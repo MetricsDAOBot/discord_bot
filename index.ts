@@ -2,8 +2,7 @@ import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Events, For
 import { CustomClient } from './utils/CustomClient';
 import 'dotenv/config';
 import axios from './services/axios';
-import { deleteReplyInteractionAfterSeconds, isValidUUID } from './utils/common';
-import moment from 'moment';
+import { deleteReplyInteractionAfterSeconds, isValidUUID, updateTags } from './utils/common';
 import { RegradeRequest } from './commands/types';
 import { DashboardBuilder } from './utils/DashboardBuilder';
 
@@ -109,11 +108,7 @@ client.on(Events.InteractionCreate, async interaction => {
 		let request = await axios.get<RegradeRequest[]>(`/regrade_request/${uuid}`);
 
 		if(request.data[0]?.thread_id) {
-			let channel = client.channels.cache.get(DISCORD_COMMUNITY_FORUM_ID) as ForumChannel;
-			let thread = client.channels.cache.get(request.data[0].thread_id) as ThreadChannel;
-			let newTags = channel.availableTags.filter(x => x.name === "Pending Approval");
-			await thread.setAppliedTags(newTags.map(x => x.id));
-			await thread.send(`Request reviewed. \`\`\`Regraded Score: ${regraded_score}\`\`\``);
+			await updateTags(client, request.data[0].thread_id, "Pending Approval", `Request reviewed. \`\`\`Regraded Score: ${regraded_score}\`\`\``);
 		}
 
 		await deleteReplyInteractionAfterSeconds(interaction, 'Your review was received successfully!', 5);
@@ -198,12 +193,9 @@ client.on(Events.InteractionCreate, async interaction => {
 				else {
 					let request = await axios.get<RegradeRequest[]>(`/regrade_request/${uuid}`);
 
-					if(interaction?.channel?.id && request.data[0]?.thread_id) {
-						let channel = client.channels.cache.get(DISCORD_COMMUNITY_FORUM_ID) as ForumChannel;
-						let thread = client.channels.cache.get(request.data[0].thread_id) as ThreadChannel;
-						let newTags = channel.availableTags.filter(x => x.name === "Closed");
-						await thread.setAppliedTags(newTags.map(x => x.id));
-						await thread.send(`Request regraded score has been approved.\n\`\`\`Old Score: ${request.data[0].current_score}\nNew Score: ${request.data[0].regraded_score}\`\`\``);
+					// update tags and send message
+					if(request.data[0]?.thread_id) {
+						await updateTags(client, request.data[0].thread_id, "Closed", `Request's regraded score has been approved.\n\`\`\`Old Score: ${request.data[0].current_score}\nNew Score: ${request.data[0].regraded_score}\`\`\``);
 					}
 
 					//decrease one page to not overflow
@@ -231,12 +223,8 @@ client.on(Events.InteractionCreate, async interaction => {
 				else {
 					let request = await axios.get<RegradeRequest[]>(`/regrade_request/${uuid}`);
 
-					if(interaction?.channel?.id && request.data[0]?.thread_id) {
-						let channel = client.channels.cache.get(DISCORD_COMMUNITY_FORUM_ID) as ForumChannel;
-						let thread = client.channels.cache.get(request.data[0].thread_id) as ThreadChannel;
-						let newTags = channel.availableTags.filter(x => x.name === "Open");
-						await thread.setAppliedTags(newTags.map(x => x.id));
-						await thread.send(`Request's regraded score has been rejected.`);
+					if(request.data[0]?.thread_id) {
+						await updateTags(client, request.data[0].thread_id, "Open", `Request's regraded score has been rejected.`);
 					}
 
 					//decrease one page to not overflow

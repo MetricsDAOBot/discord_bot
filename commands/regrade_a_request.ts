@@ -2,7 +2,7 @@ import { CacheType, ChatInputCommandInteraction, ForumChannel, ThreadChannel } f
 import { SlashCommandBuilder } from'discord.js';
 import { DISCORD_COMMUNITY_FORUM_ID } from "..";
 import axios from '../services/axios';
-import { deleteReplyInteractionAfterSeconds } from "../utils/common";
+import { deleteReplyInteractionAfterSeconds, updateTags } from "../utils/common";
 import { CustomClient } from "../utils/CustomClient";
 import { DashboardBuilder } from "../utils/DashboardBuilder";
 import { RegradeRequest } from "./types";
@@ -39,11 +39,7 @@ module.exports = {
 			} = dashboardBuilder.buildAll();
 
 			if(ret.thread_id) {
-				let channel = client.channels.cache.get(DISCORD_COMMUNITY_FORUM_ID) as ForumChannel;
-				let thread = client.channels.cache.get(ret.thread_id) as ThreadChannel;
-				let newTags = channel.availableTags.filter(x => x.name === "Reviewing");
-				await thread.setAppliedTags(newTags.map(x => x.id));
-				await thread.send(`Request is being reviewed.`);
+				await updateTags(client, ret.thread_id, "Reviewing", `Request is being reviewed.`);
 			}
 
 			await interaction.reply({ embeds: [dashboard], components: [...actionRows], ephemeral: true });

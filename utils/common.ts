@@ -1,6 +1,7 @@
-import { ButtonInteraction, ChatInputCommandInteraction, ModalSubmitInteraction, TextChannel, ThreadChannel } from 'discord.js';
+import { ButtonInteraction, ChatInputCommandInteraction, ForumChannel, ModalSubmitInteraction, TextChannel, ThreadChannel } from 'discord.js';
 import 'dotenv/config';
-import { PAGE_CHAR_LENGTH } from '..';
+import { DISCORD_COMMUNITY_FORUM_ID, PAGE_CHAR_LENGTH } from '..';
+import { CustomClient } from './CustomClient';
 
 // check if the uuid is valid as sanitization
 export const isValidUUID = (uuid: string) => {
@@ -69,5 +70,17 @@ export const sendMessageInParts = async(thread: TextChannel | ThreadChannel, tit
         await thread.send(`\n${page}\\ ${replyMessage}`);
     }
 
+    return;
+}
+
+export const updateTags = async(client: CustomClient, threadId: string, tagName: string, remark?: string) => {
+    let channel = client.channels.cache.get(DISCORD_COMMUNITY_FORUM_ID) as ForumChannel;
+    let thread = client.channels.cache.get(threadId) as ThreadChannel;
+    let newTags = channel.availableTags.filter(x => x.name === tagName);
+    await thread.setAppliedTags(newTags.map(x => x.id));
+
+    if(remark) {
+        await thread.send(remark);
+    }
     return;
 }
