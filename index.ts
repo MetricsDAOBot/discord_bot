@@ -1,4 +1,4 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Events, GatewayIntentBits, ModalBuilder, TextChannel, TextInputBuilder, TextInputStyle } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Events, ForumChannel, GatewayIntentBits, ModalBuilder, TextChannel, TextInputBuilder, TextInputStyle } from 'discord.js';
 import { CustomClient } from './utils/CustomClient';
 import 'dotenv/config';
 import axios from './services/axios';
@@ -6,6 +6,7 @@ import { deleteReplyInteractionAfterSeconds, isValidUUID } from './utils/common'
 import moment from 'moment';
 import { AxiosResponse } from 'axios';
 import { RegradeRequest } from './commands/types';
+import { DashboardBuilder } from './utils/DashboardBuilder';
 
 const TOKEN = process.env.DISCORD_BOT_TOKEN;
 const client = new CustomClient({intents: [
@@ -14,7 +15,7 @@ const client = new CustomClient({intents: [
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.MessageContent,
 ]});
-const PAGE_CHAR_LENGTH = 1900;
+export const PAGE_CHAR_LENGTH = 1900;
 
 client.on(Events.MessageCreate, function(message) {
     if (message.author.bot) return;
@@ -33,7 +34,7 @@ client.on(Events.InteractionCreate, async interaction => {
 	}
 
 	try {
-		await command.execute(interaction);
+		await command.execute(interaction, client);
 	} catch (error) {
 		console.error(error);
 		await deleteReplyInteractionAfterSeconds(interaction, 'There was an error while executing this command!', 5);
@@ -172,8 +173,6 @@ client.on(Events.InteractionCreate, async interaction => {
 						parseInt(interaction.customId.replace('nav_approval_', '')) : 
 						parseInt(interaction.customId.split('_')[1]);
 
-			let approveButtonEnabled = true;
-			let approveButtonText = "Approve";
 			let isApprovalOperation = false;
 
 			// approve the review
@@ -209,7 +208,7 @@ client.on(Events.InteractionCreate, async interaction => {
 			// reject the review
 			if(interaction.customId.includes('reject_')) {
 				let uuid = interaction.customId.split('_')[2];
-				console.log('rejecting');
+
 				let res = await axios.post<any, AxiosResponse<string>>('/reject_regrade_request', {
 					discord_id: user.id,
 					discord_name: `${user.username}#${user.discriminator}`,
@@ -247,22 +246,6 @@ client.on(Events.InteractionCreate, async interaction => {
 				return;
 			}
 
-			const button1 = new ButtonBuilder()
-								.setCustomId(`nav_approval_${page - 1}`) // split it when processing interaction
-								.setLabel('<')
-								.setStyle(ButtonStyle.Primary)
-								// if page - 1 is less than 0 then it is in the lower limit
-								.setDisabled(page - 1 < 0);
-
-			let button3 = new ButtonBuilder()
-								.setCustomId(`nav_approval_${page + 1}`) // split it when processing interaction
-								.setLabel('>')
-								.setStyle(ButtonStyle.Primary)
-								.setDisabled(true);
-
-			let actionRow = new ActionRowBuilder().addComponents(button1, button3) as any;
-
-
 			if(res.data.length === 0) {
 				if(isApprovalOperation) {
 					await interaction.update({ content: "No more pending approvals.", embeds: [], components: [] });
@@ -277,62 +260,22 @@ client.on(Events.InteractionCreate, async interaction => {
 
 			let ret = res.data[0];
 
-			const button2 = new ButtonBuilder()
-								.setCustomId(`approve_${page}_${ret.uuid}`) // split it when processing interaction
-								.setLabel(approveButtonText)
-								.setStyle(ButtonStyle.Success)
-								.setDisabled(!approveButtonEnabled);
+			let dashboardBuilder = new DashboardBuilder(ret, "Pending Approvals", 'Click the approve button if you\'re satisfied.');
+			dashboardBuilder
+				.disableApprovedAt()
+				.setNav("approve", page)
+				.enableApprove()
+				.enableReject();
 
-			const button4 = new ButtonBuilder()
-								.setCustomId(`reject_${page}_${ret.uuid}`) // split it when processing interaction
-								.setLabel(approveButtonText)
-								.setStyle(ButtonStyle.Danger)
-								.setDisabled(!approveButtonEnabled);
+			if(page === 0) dashboardBuilder.disableButtonLeft();
+			if(res.data.length < 2) dashboardBuilder.disableButtonRight();
 
-			// the data size is always 2
-			// if it's less than 2, it has no more new approvals
-			button3.setDisabled(res.data.length < 2);
+			let {
+				dashboard,
+				actionRows
+			} = dashboardBuilder.buildAll();
 
-			// inside a command, event listener, etc.
-			const dashboardEmbed = new EmbedBuilder()
-								.setColor(0x0099FF)
-								.setTitle("Pending Approvals")
-								.setDescription('Click the approve button if you\'re satisfied.')
-								.addFields(
-									{ name: 'Submission', value: ret.submission? ret.submission : 'N/A' },
-									{ name: 'Current Score', value: ret.current_score? ret.current_score.toString() : 'N/A' },
-									{ name: 'Expected Score', value: ret.expected_score? ret.expected_score.toString() : 'N/A' },
-									//{ name: 'Reason', value: ret.reason ?? 'N/A' },
-									{ name: '\u200B', value: '\u200B' },
-									{ name: 'Regraded Score', value: ret.regraded_score? ret.regraded_score.toString() : 'N/A' },
-									//{ name: 'Regraded Reason', value: ret.regraded_reason ?? 'N/A' },
-									{ name: '\u200B', value: '\u200B' },
-									{ name: 'Submitted By', value: ret.discord_name, inline: true },
-									{ name: 'Submitted At', value: moment(ret.created_at).format('YYYY-MM-DD HH:mm:ss'), inline: true },
-									{ name: '\u200B', value: '\u200B' },
-									{ name: 'Regraded By', value: ret.regraded_by? ret.regraded_by : 'N/A', inline: true },
-									{ name: 'Regraded At', value: moment(ret.regraded_at).format('YYYY-MM-DD HH:mm:ss'), inline: true },
-								);
-			const buttonRegradeReason = new ButtonBuilder()
-								.setCustomId(`reason_${ret.uuid}`) // split it when processing interaction
-								.setLabel('Regrader Feedback')
-								.setStyle(ButtonStyle.Secondary)
-								.setDisabled(!ret.reason);
-
-			const buttonReason = new ButtonBuilder()
-								.setCustomId(`reasonregraded_${ret.uuid}`) // split it when processing interaction
-								.setLabel('Regrader Feedback')
-								.setStyle(ButtonStyle.Secondary)
-								.setDisabled(!ret.regraded_reason);
-
-			const buttonFeedback = new ButtonBuilder()
-								.setCustomId(`feedback_${ret.uuid}`) // split it when processing interaction
-								.setLabel('Grader Feedback')
-								.setStyle(ButtonStyle.Secondary)
-								.setDisabled(!ret.grader_feedback);
-
-			actionRow = new ActionRowBuilder().addComponents(button1, button2, button4, buttonRegradeReason, buttonReason, buttonFeedback, button3) as any;
-			await interaction.update({ embeds: [dashboardEmbed], components: [actionRow] });
+			await interaction.update({ embeds: [dashboard], components: [...actionRows] });
 		}
 
 		catch (e){
@@ -376,52 +319,26 @@ client.on(Events.InteractionCreate, async interaction => {
 				description = 'Review in Progress';
 			}
 
-			// inside a command, event listener, etc.
-			const dashboardEmbed = new EmbedBuilder()
-								.setColor(0x0099FF)
-								.setTitle(`${user.username}'s Requests`)
-								.setDescription(description)
-								.addFields(
-									{ name: 'Submission', value: ret.submission? ret.submission : 'N/A' },
-									{ name: 'Current Score', value: ret.current_score? ret.current_score.toString() : 'N/A' },
-									{ name: 'Expected Score', value: ret.expected_score? ret.expected_score.toString() : 'N/A' },
-									//{ name: 'Reason', value: ret.reason ?? 'N/A' },
-									{ name: '\u200B', value: '\u200B' },
-									{ name: 'Regraded Score', value: ret.regraded_score? ret.regraded_score.toString() : "Not Regraded Yet" },
-									//{ name: 'Regraded Reason', value: ret.regraded_reason ?? "Not Regraded Yet" },
-									{ name: '\u200B', value: '\u200B' },
-									{ name: 'Submitted At', value: moment(ret.created_at).format('YYYY-MM-DD HH:mm:ss'), inline: true },
-									{ name: 'Regraded At', value: ret.regraded_at? moment(ret.regraded_at).format('YYYY-MM-DD HH:mm:ss') : "Not Regraded Yet", inline: true },
-									{ name: 'Approved At', value: ret.regraded_at? moment(ret.approved_at).format('YYYY-MM-DD HH:mm:ss') : "Not Approved Yet", inline: true },
-								);
+			let dashboardBuilder = new DashboardBuilder(ret, `${user.username}'s Requests`);
+			dashboardBuilder
+				.disableRegrader()
+				.setNav("self", 0);
 
-			const button1 = new ButtonBuilder()
-								.setCustomId(`nav_self_${page - 1}`) // split it when processing interaction
-								.setLabel('<')
-								.setStyle(ButtonStyle.Primary)
-								.setDisabled(page - 1 < 0);
+			if(page === 0) dashboardBuilder.disableButtonLeft();
 
-			const button3 = new ButtonBuilder()
-								.setCustomId(`nav_self_${page + 1}`) // split it when processing interaction
-								.setLabel('>')
-								.setStyle(ButtonStyle.Primary)
-								// res.data.length is always 2
-								// less than 2 = no more data
-								.setDisabled(res.data.length < 2);
+			// res.data.length is always 2
+			// less than 2 = no more data
+			if(res.data.length < 2) dashboardBuilder.disableButtonRight();
+			
+			let {
+				dashboard,
+				actionRows
+			} = dashboardBuilder.buildAll();
 
-			const buttonReason = new ButtonBuilder()
-								.setCustomId(`reasonregraded_${ret.uuid}`) // split it when processing interaction
-								.setLabel('Regrader Feedback')
-								.setStyle(ButtonStyle.Secondary)
-								.setDisabled(!ret.regraded_reason);
-
-			const actionRow = new ActionRowBuilder().addComponents(button1, buttonReason, button3) as any;
-
-			await interaction.update({  embeds: [dashboardEmbed], components: [actionRow] });
+			await interaction.update({  embeds: [dashboard], components: [...actionRows] });
 		}
 
 		catch (e){
-			console.log(e);
 			await deleteReplyInteractionAfterSeconds(interaction, "Unable to get pending approvals.", 5);
 			//await interaction.reply({ content: "Unable to get pending approvals.", ephemeral: true });
 		}
@@ -450,7 +367,7 @@ client.on(Events.InteractionCreate, async interaction => {
 			case "feedback":
 				wordArray = ret.grader_feedback?.split(" ") ?? [];
 				oriStringLength = ret.grader_feedback?.length ?? 0;
-				break;
+				break;       
 			case "reason":
 				wordArray = ret.reason?.split(" ") ?? [];
 				oriStringLength = ret.reason?.length ?? 0;

@@ -1,9 +1,9 @@
 import { AxiosResponse } from "axios";
-import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, CacheType, ChatInputCommandInteraction, EmbedBuilder } from "discord.js";
+import { AttachmentBuilder, CacheType, ChatInputCommandInteraction } from "discord.js";
 import { SlashCommandBuilder } from'discord.js';
-import moment from "moment";
 import axios from '../services/axios';
 import { deleteReplyInteractionAfterSeconds, sleep } from "../utils/common";
+import { DashboardBuilder } from "../utils/DashboardBuilder";
 import { RegradeRequest } from "./types";
 
 module.exports = {
@@ -50,49 +50,23 @@ module.exports = {
 				return;
 			}
 
-			// inside a command, event listener, etc.
-			const dashboardEmbed = new EmbedBuilder()
-								.setColor(0x0099FF)
-								.setTitle(`${user.username}'s Requests`)
-								.addFields(
-									{ name: 'Submission', value: ret.submission? ret.submission : 'N/A' },
-									{ name: 'Current Score', value: ret.current_score? ret.current_score.toString() : 'N/A' },
-									{ name: 'Expected Score', value: ret.expected_score? ret.expected_score.toString() : 'N/A' },
-									//{ name: 'Reason', value: ret.reason ?? 'N/A' },
-									{ name: '\u200B', value: '\u200B' },
-									{ name: 'Regraded Score', value: ret.regraded_score? ret.regraded_score.toString() : "Not Regraded Yet" },
-									//{ name: 'Regraded Reason', value: ret.regraded_reason ?? "Not Regraded Yet" },
-									{ name: '\u200B', value: '\u200B' },
-								)
-								.addFields([
-									{ name: 'Submitted At', value: moment(ret.created_at).format('YYYY-MM-DD HH:mm:ss'), inline: true },
-									{ name: 'Regraded At', value: ret.regraded_at? moment(ret.regraded_at).format('YYYY-MM-DD HH:mm:ss') : "Not Regraded Yet", inline: true },
-									{ name: 'Approved At', value: ret.approved_at? moment(ret.approved_at).format('YYYY-MM-DD HH:mm:ss') : "Not Approved Yet", inline: true },
-								]);
+			let dashboardBuilder = new DashboardBuilder(ret, `${user.username}'s Requests`);
+			dashboardBuilder
+				.disableRegrader()
+				.disableButtonLeft()
+				.setNav("self", 0);
 
-			const button1 = new ButtonBuilder()
-								.setCustomId(`nav_self_0`) // split it when processing interaction
-								.setLabel('<')
-								.setStyle(ButtonStyle.Primary)
-								.setDisabled(true);
+			// res.data.length is always 2
+			// less than 2 = no more data
+			if(res.data.length < 2) dashboardBuilder.disableButtonRight();
+			
 
-			const buttonReason = new ButtonBuilder()
-								.setCustomId(`reasonregraded_-1_${ret.uuid}`) // split it when processing interaction
-								.setLabel('Regrader Feedback')
-								.setStyle(ButtonStyle.Secondary)
-								.setDisabled(!ret.regraded_reason);
+			let {
+				dashboard,
+				actionRows
+			} = dashboardBuilder.buildAll();
 
-			const button3 = new ButtonBuilder()
-								.setCustomId(`nav_self_1`) // split it when processing interaction
-								.setLabel('>')
-								.setStyle(ButtonStyle.Primary)
-								// res.data.length is always 2
-								// less than 2 = no more data
-								.setDisabled(res.data.length < 2);
-
-			const actionRow = new ActionRowBuilder().addComponents(button1, buttonReason, button3) as any;
-
-			await interaction.reply({ embeds: [dashboardEmbed], components: [actionRow], ephemeral: true });
+			await interaction.reply({ embeds: [dashboard], components: [...actionRows], ephemeral: true });
 		}
 
 		catch (e){
