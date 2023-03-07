@@ -1,14 +1,12 @@
-import { CacheType, ChatInputCommandInteraction, EmbedBuilder, ForumChannel } from "discord.js";
+import { CacheType, ChatInputCommandInteraction, ForumChannel } from "discord.js";
 import { SlashCommandBuilder } from'discord.js';
 import axios from '../services/axios';
 import { deleteReplyInteractionAfterSeconds, sendMessageInParts, sleep } from "../utils/common";
 import { CustomClient } from "../utils/CustomClient";
 import 'dotenv/config';
 import { RegradeRequest } from "./types";
-import moment from "moment";
 import { DashboardBuilder } from "../utils/DashboardBuilder";
-
-const DISCORD_COMMUNITY_FORUM_ID = process.env.DISCORD_COMMUNITY_FORUM_ID;
+import { DISCORD_COMMUNITY_FORUM_ID } from "..";
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -28,7 +26,7 @@ module.exports = {
             let count = 0;
             for(const request of requests.data) {
 
-                let channel = client.channels.cache.get(DISCORD_COMMUNITY_FORUM_ID!) as ForumChannel;
+                let channel = client.channels.cache.get(DISCORD_COMMUNITY_FORUM_ID) as ForumChannel;
 
                 let title = `[${request.blockchain ?? "N/A"}] ${request.question ?? "Review Request"} (${request.discord_name})`;
                 let message = `Submitted by <@${request.discord_id}>`;

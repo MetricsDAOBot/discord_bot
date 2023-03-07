@@ -1,4 +1,4 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Events, ForumChannel, GatewayIntentBits, ModalBuilder, TextChannel, TextInputBuilder, TextInputStyle } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Events, ForumChannel, GatewayIntentBits, ModalBuilder, TextChannel, TextInputBuilder, TextInputStyle, ThreadChannel } from 'discord.js';
 import { CustomClient } from './utils/CustomClient';
 import 'dotenv/config';
 import axios from './services/axios';
@@ -9,6 +9,8 @@ import { RegradeRequest } from './commands/types';
 import { DashboardBuilder } from './utils/DashboardBuilder';
 
 const TOKEN = process.env.DISCORD_BOT_TOKEN;
+export const DISCORD_COMMUNITY_FORUM_ID = process.env.DISCORD_COMMUNITY_FORUM_ID!;
+
 const client = new CustomClient({intents: [
     GatewayIntentBits.DirectMessages,
     GatewayIntentBits.Guilds,
@@ -107,8 +109,12 @@ client.on(Events.InteractionCreate, async interaction => {
 
 		let request = await axios.get<RegradeRequest[]>(`/regrade_request/${uuid}`);
 
-		if(interaction?.channel?.id && request.data[0]?.thread_id) {
-			await (client.channels.cache.get(request.data[0].thread_id) as TextChannel).send(`Request Reviewed`);
+		if(request.data[0]?.thread_id) {
+			let channel = client.channels.cache.get(DISCORD_COMMUNITY_FORUM_ID) as ForumChannel;
+			let thread = client.channels.cache.get(request.data[0].thread_id) as ThreadChannel;
+			let newTags = channel.availableTags.filter(x => x.name === "Pending Approval");
+			await thread.setAppliedTags(newTags.map(x => x.id));
+			await thread.send(`Request reviewed. \`\`\`Regraded Score: ${regraded_score}\`\`\``);
 		}
 
 		await deleteReplyInteractionAfterSeconds(interaction, 'Your review was received successfully!', 5);
@@ -195,7 +201,11 @@ client.on(Events.InteractionCreate, async interaction => {
 					let request = await axios.get<RegradeRequest[]>(`/regrade_request/${uuid}`);
 
 					if(interaction?.channel?.id && request.data[0]?.thread_id) {
-						await (client.channels.cache.get(request.data[0].thread_id) as TextChannel).send(`Request regraded score has been approved.\n\`\`\`Old Score: ${request.data[0].current_score}\nNew Score: ${request.data[0].regraded_score}\`\`\``);
+						let channel = client.channels.cache.get(DISCORD_COMMUNITY_FORUM_ID) as ForumChannel;
+						let thread = client.channels.cache.get(request.data[0].thread_id) as ThreadChannel;
+						let newTags = channel.availableTags.filter(x => x.name === "Closed");
+						await thread.setAppliedTags(newTags.map(x => x.id));
+						await thread.send(`Request regraded score has been approved.\n\`\`\`Old Score: ${request.data[0].current_score}\nNew Score: ${request.data[0].regraded_score}\`\`\``);
 					}
 
 					//decrease one page to not overflow
@@ -225,7 +235,11 @@ client.on(Events.InteractionCreate, async interaction => {
 					let request = await axios.get<RegradeRequest[]>(`/regrade_request/${uuid}`);
 
 					if(interaction?.channel?.id && request.data[0]?.thread_id) {
-						await (client.channels.cache.get(request.data[0].thread_id) as TextChannel).send(`Request's regraded score has been rejected.`);
+						let channel = client.channels.cache.get(DISCORD_COMMUNITY_FORUM_ID) as ForumChannel;
+						let thread = client.channels.cache.get(request.data[0].thread_id) as ThreadChannel;
+						let newTags = channel.availableTags.filter(x => x.name === "Open");
+						await thread.setAppliedTags(newTags.map(x => x.id));
+						await thread.send(`Request's regraded score has been rejected.`);
 					}
 
 					//decrease one page to not overflow
@@ -319,7 +333,7 @@ client.on(Events.InteractionCreate, async interaction => {
 				description = 'Review in Progress';
 			}
 
-			let dashboardBuilder = new DashboardBuilder(ret, `${user.username}'s Requests`);
+			let dashboardBuilder = new DashboardBuilder(ret, `${user.username}'s Requests`, description);
 			dashboardBuilder
 				.disableRegrader()
 				.setNav("self", 0);
