@@ -2,7 +2,7 @@ import { CacheType, ChatInputCommandInteraction, ForumChannel, ThreadChannel } f
 import { SlashCommandBuilder } from'discord.js';
 import { DISCORD_COMMUNITY_FORUM_ID } from "..";
 import axios from '../services/axios';
-import { deleteReplyInteractionAfterSeconds, updateTags } from "../utils/common";
+import { deleteReplyInteractionAfterSeconds, updateRequestDetails, updateTags } from "../utils/common";
 import { CustomClient } from "../utils/CustomClient";
 import { DashboardBuilder } from "../utils/DashboardBuilder";
 import { RegradeRequest } from "./types";
@@ -39,6 +39,7 @@ module.exports = {
 			} = dashboardBuilder.buildAll();
 
 			if(ret.thread_id) {
+				await updateRequestDetails(client, ret);
 				await updateTags(client, ret.thread_id, "Reviewing", `Request is being reviewed.`);
 			}
 

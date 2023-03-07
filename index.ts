@@ -2,7 +2,7 @@ import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Events, For
 import { CustomClient } from './utils/CustomClient';
 import 'dotenv/config';
 import axios from './services/axios';
-import { deleteReplyInteractionAfterSeconds, isValidUUID, newThread, updateTags } from './utils/common';
+import { deleteReplyInteractionAfterSeconds, isValidUUID, newThread, updateRequestDetails, updateTags } from './utils/common';
 import { RegradeRequest } from './commands/types';
 import { DashboardBuilder } from './utils/DashboardBuilder';
 
@@ -133,6 +133,7 @@ client.on(Events.InteractionCreate, async interaction => {
 		let request = await axios.get<RegradeRequest[]>(`/regrade_request/${uuid}`);
 
 		if(request.data[0]?.thread_id) {
+			await updateRequestDetails(client, request.data[0]);
 			await updateTags(client, request.data[0].thread_id, "Pending Approval", `Request reviewed. \`\`\`Regraded Score: ${regraded_score}\`\`\``);
 		}
 
@@ -220,6 +221,7 @@ client.on(Events.InteractionCreate, async interaction => {
 
 					// update tags and send message
 					if(request.data[0]?.thread_id) {
+						await updateRequestDetails(client, request.data[0]);
 						await updateTags(client, request.data[0].thread_id, "Closed", `Request's regraded score has been approved.\n\`\`\`Old Score: ${request.data[0].current_score}\nNew Score: ${request.data[0].regraded_score}\`\`\``);
 					}
 
@@ -249,6 +251,7 @@ client.on(Events.InteractionCreate, async interaction => {
 					let request = await axios.get<RegradeRequest[]>(`/regrade_request/${uuid}`);
 
 					if(request.data[0]?.thread_id) {
+						await updateRequestDetails(client, request.data[0]);
 						await updateTags(client, request.data[0].thread_id, "Open", `Request's regraded score has been rejected.`);
 					}
 

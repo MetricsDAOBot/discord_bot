@@ -217,7 +217,7 @@ export class DashboardBuilder {
 
             if(!disableRegradedScore) {
                 dashboard.addFields(
-                    { name: 'Approved At', value: request.regraded_at? moment(request.approved_at).format('YYYY-MM-DD HH:mm:ss') : "Not Approved Yet", inline: true },
+                    { name: 'Approved At', value: request.approved_at? moment(request.approved_at).format('YYYY-MM-DD HH:mm:ss') : "Not Approved Yet", inline: true },
                 );
             }
         }

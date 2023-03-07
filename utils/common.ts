@@ -76,6 +76,25 @@ export const sendMessageInParts = async(thread: TextChannel | ThreadChannel, tit
     return;
 }
 
+export const updateRequestDetails = async(client: CustomClient, request: RegradeRequest) => {
+    let thread = client.channels.cache.get(request.thread_id!) as ThreadChannel;
+    let message = `Submitted by <@${request.discord_id}>`;
+
+    let dashboardBuilder = new DashboardBuilder(request, "Request Details");
+    dashboardBuilder
+        .disableRegrader()
+        .disableThread();
+    let dashboard = dashboardBuilder.buildDashboard();
+    let firstMessage = thread.messages.cache.get(request.first_message_id!);
+
+    if(firstMessage) {
+        await firstMessage.edit({
+            embeds: [dashboard]
+        });
+    }
+    return;
+}
+
 export const updateTags = async(client: CustomClient, threadId: string, tagName: string, remark?: string) => {
     let channel = client.channels.cache.get(DISCORD_COMMUNITY_FORUM_ID) as ForumChannel;
     let thread = client.channels.cache.get(threadId) as ThreadChannel;
