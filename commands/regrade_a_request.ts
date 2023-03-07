@@ -1,4 +1,3 @@
-import { AxiosResponse } from "axios";
 import { CacheType, ChatInputCommandInteraction, ForumChannel, ThreadChannel } from "discord.js";
 import { SlashCommandBuilder } from'discord.js';
 import { DISCORD_COMMUNITY_FORUM_ID } from "..";
@@ -15,16 +14,12 @@ module.exports = {
 	async execute(interaction: ChatInputCommandInteraction<CacheType>, client: CustomClient) {
 		try {
 			let { user } = interaction;
-			let res = await axios.patch<any, AxiosResponse<RegradeRequest | string>>('/assign_grader_to_request', {
+			let res = await axios.patch<RegradeRequest | string>('/assign_grader_to_request', {
 				discord_id: user.id,
 				discord_name: `${user.username}#${user.discriminator}`,
 			});
 
 			let ret = res.data;
-			// if new regrade request is added, it's gonna be a uuid
-			/* if(isValidUUID(res.data)) {
-				ret = "Please regrade this request: " + getFrontendBaseUrl() + `/regrade_request/${res.data}`;
-			} */
 
 			if(typeof ret === "string") {
 				await deleteReplyInteractionAfterSeconds(interaction, ret, 5);

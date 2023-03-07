@@ -1,4 +1,3 @@
-import { AxiosResponse } from "axios";
 import { AttachmentBuilder, CacheType, ChatInputCommandInteraction } from "discord.js";
 import { SlashCommandBuilder } from'discord.js';
 import axios from '../services/axios';

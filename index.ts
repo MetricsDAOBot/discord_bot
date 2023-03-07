@@ -4,7 +4,6 @@ import 'dotenv/config';
 import axios from './services/axios';
 import { deleteReplyInteractionAfterSeconds, isValidUUID } from './utils/common';
 import moment from 'moment';
-import { AxiosResponse } from 'axios';
 import { RegradeRequest } from './commands/types';
 import { DashboardBuilder } from './utils/DashboardBuilder';
 
@@ -185,7 +184,7 @@ client.on(Events.InteractionCreate, async interaction => {
 			if(interaction.customId.includes('approve_')) {
 				let uuid = interaction.customId.split('_')[2];
 
-				let res = await axios.post<any, AxiosResponse<string>>('/approve_regrade_request', {
+				let res = await axios.post<string>('/approve_regrade_request', {
 					discord_id: user.id,
 					discord_name: `${user.username}#${user.discriminator}`,
 					uuid,
@@ -193,7 +192,6 @@ client.on(Events.InteractionCreate, async interaction => {
 
 				if(res.data !== "Approved") {
 					await deleteReplyInteractionAfterSeconds(interaction, res.data, 5);
-					// await interaction.reply({ content: res.data, ephemeral: true });
 					return;
 				}
 
@@ -219,7 +217,7 @@ client.on(Events.InteractionCreate, async interaction => {
 			if(interaction.customId.includes('reject_')) {
 				let uuid = interaction.customId.split('_')[2];
 
-				let res = await axios.post<any, AxiosResponse<string>>('/reject_regrade_request', {
+				let res = await axios.post<string>('/reject_regrade_request', {
 					discord_id: user.id,
 					discord_name: `${user.username}#${user.discriminator}`,
 					uuid,
@@ -227,7 +225,6 @@ client.on(Events.InteractionCreate, async interaction => {
 
 				if(res.data !== "Rejected") {
 					await deleteReplyInteractionAfterSeconds(interaction, res.data, 5);
-					// await interaction.reply({ content: res.data, ephemeral: true });
 					return;
 				}
 
@@ -249,14 +246,13 @@ client.on(Events.InteractionCreate, async interaction => {
 				}
 			}
 
-			let res = await axios.post<any, AxiosResponse<RegradeRequest[] | string>>('/pending_approvals', {
+			let res = await axios.post<RegradeRequest[]>('/pending_approvals', {
 				discord_id: user.id,
 				page,
 			});
 
 			if(typeof res.data === "string") {
 				await deleteReplyInteractionAfterSeconds(interaction, res.data, 5);
-				// await interaction.reply({ content: res.data, ephemeral: true });
 				return;
 			}
 
@@ -267,7 +263,6 @@ client.on(Events.InteractionCreate, async interaction => {
 
 				else {
 					await deleteReplyInteractionAfterSeconds(interaction, "No pending approvals.", 5);
-					// await interaction.reply({ content: "No pending approvals.", ephemeral: true });
 				}
 				return;
 			}
@@ -295,7 +290,6 @@ client.on(Events.InteractionCreate, async interaction => {
 		catch (e){
 			console.log(e);
 			await deleteReplyInteractionAfterSeconds(interaction, "Unable to get pending approvals.", 5);
-			// await interaction.reply({ content: "Unable to get pending approvals.", ephemeral: true });
 		}
 	}
 
@@ -304,17 +298,15 @@ client.on(Events.InteractionCreate, async interaction => {
 		try {
 			let { user } = interaction;
 			let page = parseInt(interaction.customId.replace('nav_self_', ''));
-			let res = await axios.get<any, AxiosResponse<RegradeRequest[] | string>>(`/regrade_requests/${user.id}/${page}`);
+			let res = await axios.get<RegradeRequest[] | string>(`/regrade_requests/${user.id}/${page}`);
 
 			if(typeof res.data === "string") {
 				await deleteReplyInteractionAfterSeconds(interaction, res.data, 5);
-				// await interaction.reply({ content: res.data, ephemeral: true });
 				return;
 			}
 
 			if(res.data.length === 0) {
 				await deleteReplyInteractionAfterSeconds(interaction, "You have no requests.", 5);
-				// await interaction.reply({ content: "You have no requests.", ephemeral: true });
 				return;
 			}
 
@@ -354,7 +346,6 @@ client.on(Events.InteractionCreate, async interaction => {
 
 		catch (e){
 			await deleteReplyInteractionAfterSeconds(interaction, "Unable to get pending approvals.", 5);
-			//await interaction.reply({ content: "Unable to get pending approvals.", ephemeral: true });
 		}
 	}
 

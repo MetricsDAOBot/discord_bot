@@ -1,7 +1,5 @@
-import { AxiosResponse } from "axios";
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, CacheType, ChatInputCommandInteraction, EmbedBuilder } from "discord.js";
+import { CacheType, ChatInputCommandInteraction } from "discord.js";
 import { SlashCommandBuilder } from'discord.js';
-import moment from "moment";
 import axios from '../services/axios';
 import { deleteReplyInteractionAfterSeconds } from "../utils/common";
 import { DashboardBuilder } from "../utils/DashboardBuilder";
@@ -14,7 +12,7 @@ module.exports = {
 	async execute(interaction: ChatInputCommandInteraction<CacheType>) {
 		try {
 			let { user } = interaction;
-			let res = await axios.post<any, AxiosResponse<RegradeRequest[] | string>>('/pending_approvals', {
+			let res = await axios.post<RegradeRequest[]>('/pending_approvals', {
 				discord_id: user.id,
 				page: 0,
 			});

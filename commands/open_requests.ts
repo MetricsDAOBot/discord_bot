@@ -1,9 +1,8 @@
-import { AxiosResponse } from "axios";
-import { AttachmentBuilder, CacheType, ChatInputCommandInteraction } from "discord.js";
+import { CacheType, ChatInputCommandInteraction } from "discord.js";
 import { SlashCommandBuilder } from'discord.js';
 import axios from '../services/axios';
 import { deleteReplyInteractionAfterSeconds, sleep } from "../utils/common";
-import { RegradeRequest, RegradeRequestCSV } from "./types";
+import { RegradeRequestCSV } from "./types";
 
 const OPEN_FOR_REVIEW = 0;
 const REVIEW_IN_PROGRESS = 1;

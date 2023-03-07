@@ -1,4 +1,3 @@
-import { AxiosResponse } from "axios";
 import { AttachmentBuilder, CacheType, ChatInputCommandInteraction } from "discord.js";
 import { SlashCommandBuilder } from'discord.js';
 import axios from '../services/axios';
@@ -16,7 +15,7 @@ module.exports = {
 	async execute(interaction: ChatInputCommandInteraction<CacheType>) {
 		try {
 			let { user } = interaction;
-			let res = await axios.get<any, AxiosResponse<RegradeRequest[] | string>>(`/regrade_requests/${user.id}/0`);
+			let res = await axios.get<RegradeRequest[] | string>(`/regrade_requests/${user.id}/0`);
 
 			if(typeof res.data === "string") {
 				await deleteReplyInteractionAfterSeconds(interaction, res.data, 5);
@@ -36,7 +35,7 @@ module.exports = {
 
 			//return csv file
 			if(asCsv) {
-				let allRequests = await axios.get<any, AxiosResponse<RegradeRequest[]>>(`/regrade_requests/${user.id}`);
+				let allRequests = await axios.get<RegradeRequest[]>(`/regrade_requests/${user.id}`);
 				let ret = '"discord_name","created_at","updated_at","regraded_at","approved_at","uuid","is_regrading","link","grader_feedback","current_score","expected_score","reason","regraded_score","regraded_reason"';
 				allRequests.data.forEach(request => {
 					const {discord_name, created_at, updated_at, regraded_at, approved_at, uuid, is_regrading, submission, grader_feedback, current_score, expected_score, reason, regraded_score, regraded_reason} = request;
