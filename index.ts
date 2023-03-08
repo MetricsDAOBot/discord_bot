@@ -2,7 +2,7 @@ import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Events, For
 import { CustomClient } from './utils/CustomClient';
 import 'dotenv/config';
 import axios from './services/axios';
-import { deleteReplyInteractionAfterSeconds, isValidUUID, newThread, updateRequestDetails, updateTags } from './utils/common';
+import { closeThread, deleteReplyInteractionAfterSeconds, isValidUUID, newThread, updateRequestDetails, updateTags } from './utils/common';
 import { RegradeRequest } from './commands/types';
 import { DashboardBuilder } from './utils/DashboardBuilder';
 
@@ -62,6 +62,7 @@ client.on(Events.InteractionCreate, async interaction => {
 			await deleteReplyInteractionAfterSeconds(interaction, "E01: Error adding new request.", 5);
 			return;
 		}
+		await interaction.deferReply();
 		let { blockchain, bounty_name } = newRequests[user.id];
 		const submission = (interaction.fields.getField('submission') as any).value;
 		const current_score = (interaction.fields.getField('current_score') as any).value;
@@ -84,7 +85,7 @@ client.on(Events.InteractionCreate, async interaction => {
 		});
 
 		if(!isValidUUID(res.data)) {
-			await deleteReplyInteractionAfterSeconds(interaction, res.data, 5);
+			await deleteReplyInteractionAfterSeconds(interaction, res.data, 5, "update");
 			// await interaction.reply({ content: res.data, ephemeral: true });
 			return;
 		}
@@ -99,7 +100,7 @@ client.on(Events.InteractionCreate, async interaction => {
 			await newThread(client, request);
 		}
 
-		await deleteReplyInteractionAfterSeconds(interaction, 'Your submission was received successfully!', 5);
+		await deleteReplyInteractionAfterSeconds(interaction, 'Your submission was received successfully!', 5, "update");
 
 		//remove cache
 		delete newRequests[user.id];
@@ -211,25 +212,25 @@ client.on(Events.InteractionCreate, async interaction => {
 					uuid,
 				});
 
+				// has error
 				if(res.data !== "Approved") {
 					await deleteReplyInteractionAfterSeconds(interaction, res.data, 5);
 					return;
 				}
 
-				else {
-					let request = await axios.get<RegradeRequest[]>(`/regrade_request/${uuid}`);
+				let request = await axios.get<RegradeRequest[]>(`/regrade_request/${uuid}`);
 
-					// update tags and send message
-					if(request.data[0]?.thread_id) {
-						await updateRequestDetails(client, request.data[0]);
-						await updateTags(client, request.data[0].thread_id, "Closed", `Request's regraded score has been approved.\n\`\`\`Old Score: ${request.data[0].current_score}\nNew Score: ${request.data[0].regraded_score}\`\`\``);
-					}
-
-					//decrease one page to not overflow
-					page--;
-					page = page < 0? 0 : page;
-					isApprovalOperation = true;
+				// update tags and send message
+				if(request.data[0]?.thread_id) {
+					await updateRequestDetails(client, request.data[0]);
+					await updateTags(client, request.data[0].thread_id, "Closed", `Request's regraded score has been approved.\n\`\`\`Old Score: ${request.data[0].current_score}\nNew Score: ${request.data[0].regraded_score}\`\`\``);
+					await closeThread(client, request.data[0]);
 				}
+
+				//decrease one page to not overflow
+				page--;
+				page = page < 0? 0 : page;
+				isApprovalOperation = true;
 			}
 
 			// reject the review
@@ -242,24 +243,23 @@ client.on(Events.InteractionCreate, async interaction => {
 					uuid,
 				});
 
+				// has error
 				if(res.data !== "Rejected") {
 					await deleteReplyInteractionAfterSeconds(interaction, res.data, 5);
 					return;
 				}
 
-				else {
-					let request = await axios.get<RegradeRequest[]>(`/regrade_request/${uuid}`);
+				let request = await axios.get<RegradeRequest[]>(`/regrade_request/${uuid}`);
 
-					if(request.data[0]?.thread_id) {
-						await updateRequestDetails(client, request.data[0]);
-						await updateTags(client, request.data[0].thread_id, "Open", `Request's regraded score has been rejected.`);
-					}
-
-					//decrease one page to not overflow
-					page--;
-					page = page < 0? 0 : page;
-					isApprovalOperation = true;
+				if(request.data[0]?.thread_id) {
+					await updateRequestDetails(client, request.data[0]);
+					await updateTags(client, request.data[0].thread_id, "Open", `Request's regraded score has been rejected.`);
 				}
+
+				//decrease one page to not overflow
+				page--;
+				page = page < 0? 0 : page;
+				isApprovalOperation = true;
 			}
 
 			let res = await axios.post<RegradeRequest[]>('/pending_approvals', {

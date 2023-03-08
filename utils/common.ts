@@ -27,8 +27,15 @@ export function sleep(ms: number) {
  * @param content 
  * @param s 
  */
-export async function deleteReplyInteractionAfterSeconds(interaction: ChatInputCommandInteraction | ModalSubmitInteraction | ButtonInteraction, content: string, s: number) {
-    await interaction.reply({ content, ephemeral: true });
+export async function deleteReplyInteractionAfterSeconds(interaction: ChatInputCommandInteraction | ModalSubmitInteraction | ButtonInteraction, content: string, s: number, type: "update" | "reply" = "reply") {
+    if(type === "reply") {
+        await interaction.reply({ content, ephemeral: true });
+    }
+
+    else {
+        await interaction.editReply({ content });
+    }
+    
     await sleep(s * 1000);
     await interaction.deleteReply();
 }
@@ -153,4 +160,9 @@ export const newThread = async(client: CustomClient, request: RegradeRequest) =>
     if(request.regraded_reason) await sendMessageInParts(thread, "Regrade Feedback", request.regraded_reason);
 
     return;
+}
+
+export const closeThread = async(client: CustomClient, request: RegradeRequest) => {
+    let thread = client.channels.cache.get(request.thread_id!) as ThreadChannel;
+    await thread.setLocked(true);
 }

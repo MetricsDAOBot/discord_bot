@@ -1,6 +1,5 @@
-import { CacheType, ChatInputCommandInteraction, ForumChannel, ThreadChannel } from "discord.js";
+import { CacheType, ChatInputCommandInteraction } from "discord.js";
 import { SlashCommandBuilder } from'discord.js';
-import { DISCORD_COMMUNITY_FORUM_ID } from "..";
 import axios from '../services/axios';
 import { deleteReplyInteractionAfterSeconds, updateRequestDetails, updateTags } from "../utils/common";
 import { CustomClient } from "../utils/CustomClient";
@@ -23,7 +22,6 @@ module.exports = {
 
 			if(typeof ret === "string") {
 				await deleteReplyInteractionAfterSeconds(interaction, ret, 5);
-				// await interaction.reply({ content: ret, ephemeral: true });
 				return;
 			}
 
@@ -49,7 +47,6 @@ module.exports = {
 		catch (e){
 			console.log(e);
             await deleteReplyInteractionAfterSeconds(interaction, "Error assigning you to a request!", 5);
-            // await interaction.reply({ content: "Error assigning you to a request!", ephemeral: true });
 		}
 	},
 };
