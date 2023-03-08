@@ -23,6 +23,7 @@ export class DashboardBuilder {
         disableSubmittedAt: false,
         disableApprovedAt: false,
         disableThread: false,
+        disablePaymentStatus: false,
 
         // buttons
         disableRegradeReason: false,
@@ -105,6 +106,11 @@ export class DashboardBuilder {
         return this;
     }
 
+    disablePaymentStatus = () => {
+        this.config.disablePaymentStatus = true;
+        return this;
+    }
+
     setNav = (type: "self" | "approve", nav_page: number) => {
         this.config.nav_type = type;
         this.config.nav_page = nav_page;
@@ -147,7 +153,9 @@ export class DashboardBuilder {
             disableRegradedAt,
             disableSubmittedAt,
             disableApprovedAt,
-            disableThread
+            disableThread,
+            disablePaymentStatus,
+
         } = config;
 
         let dashboard = new EmbedBuilder()
@@ -218,6 +226,36 @@ export class DashboardBuilder {
             if(!disableRegradedScore) {
                 dashboard.addFields(
                     { name: 'Approved At', value: request.approved_at? moment(request.approved_at).format('YYYY-MM-DD HH:mm:ss') : "Not Approved Yet", inline: true },
+                );
+            }
+        }
+
+        if(!disablePaymentStatus) {
+            dashboard.addFields(
+                { name: '\u200B', value: '\u200B' },
+            );
+
+            if(request.is_payment_expected) {
+                let paymentStatus = "Unpaid";
+                // pardon the nested ifs
+                if(request.paid_at) {
+                    paymentStatus = "Paid";
+                }
+
+                else if (request.is_payment_assigned) {
+                    paymentStatus = "Assigned";
+                }
+                
+                dashboard.addFields(
+                    { name: 'Payment Status', value: paymentStatus, inline: true },
+                    { name: 'Paid At', value: request.paid_at? moment(request.paid_at).format('YYYY-MM-DD HH:mm:ss') : "Not Paid Yet", inline: true },
+                    { name: 'Tx', value: request.payment_tx_hash? request.payment_tx_hash : "N/A" },
+                );
+            }
+
+            else {
+                dashboard.addFields(
+                    { name: 'Payment Status', value: "No Payment Required" },
                 );
             }
         }

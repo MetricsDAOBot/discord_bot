@@ -62,7 +62,7 @@ client.on(Events.InteractionCreate, async interaction => {
 			await deleteReplyInteractionAfterSeconds(interaction, "E01: Error adding new request.", 5);
 			return;
 		}
-		await interaction.deferReply();
+		await interaction.deferReply({ ephemeral: true });
 		let { blockchain, bounty_name } = newRequests[user.id];
 		const submission = (interaction.fields.getField('submission') as any).value;
 		const current_score = (interaction.fields.getField('current_score') as any).value;
@@ -290,7 +290,8 @@ client.on(Events.InteractionCreate, async interaction => {
 				.disableApprovedAt()
 				.setNav("approve", page)
 				.enableApprove()
-				.enableReject();
+				.enableReject()
+				.disablePaymentStatus();
 
 			if(page === 0) dashboardBuilder.disableButtonLeft();
 			if(res.data.length < 2) dashboardBuilder.disableButtonRight();
@@ -346,6 +347,7 @@ client.on(Events.InteractionCreate, async interaction => {
 				.disableRegrader()
 				.setNav("self", 0);
 
+			if(!ret.approved_at) dashboardBuilder.disablePaymentStatus();
 			if(page === 0) dashboardBuilder.disableButtonLeft();
 
 			// res.data.length is always 2

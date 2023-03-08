@@ -27,6 +27,11 @@ export type RegradeRequest = {
     approved_by: string | null;
     approved_by_id: string | null;
 
+    is_payment_expected: boolean | null;
+    is_payment_assigned: boolean | null;
+    paid_at: string | null;
+    payment_tx_hash: string | null;
+
     deleted_at: string | null;
 }
 

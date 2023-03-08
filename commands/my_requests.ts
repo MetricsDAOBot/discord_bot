@@ -55,6 +55,12 @@ module.exports = {
 				.disableButtonLeft()
 				.setNav("self", 0);
 
+			// dont show payment status if not approved yet
+			if(!ret.approved_at) {
+				dashboardBuilder
+					.disablePaymentStatus();
+			}
+
 			// res.data.length is always 2
 			// less than 2 = no more data
 			if(res.data.length < 2) dashboardBuilder.disableButtonRight();

@@ -37,7 +37,8 @@ module.exports = {
 				.setNav("approve", 0)
 				.disableButtonLeft()
 				.enableApprove()
-				.enableReject();
+				.enableReject()
+				.disablePaymentStatus();
 
 			if(res.data.length < 2) dashboardBuilder.disableButtonRight();
 

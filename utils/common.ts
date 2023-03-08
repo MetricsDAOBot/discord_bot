@@ -35,7 +35,7 @@ export async function deleteReplyInteractionAfterSeconds(interaction: ChatInputC
     else {
         await interaction.editReply({ content });
     }
-    
+
     await sleep(s * 1000);
     await interaction.deleteReply();
 }
@@ -84,15 +84,17 @@ export const sendMessageInParts = async(thread: TextChannel | ThreadChannel, tit
 }
 
 export const updateRequestDetails = async(client: CustomClient, request: RegradeRequest) => {
-    let thread = client.channels.cache.get(request.thread_id!) as ThreadChannel;
-    let message = `Submitted by <@${request.discord_id}>`;
+    let thread = await client.channels.fetch(request.thread_id!) as ThreadChannel;
 
     let dashboardBuilder = new DashboardBuilder(request, "Request Details");
     dashboardBuilder
         .disableRegrader()
         .disableThread();
+
+    if(!request.approved_at) dashboardBuilder.disablePaymentStatus();
+    
     let dashboard = dashboardBuilder.buildDashboard();
-    let firstMessage = thread.messages.cache.get(request.first_message_id!);
+    let firstMessage = await thread.messages.fetch(request.first_message_id!);
 
     if(firstMessage) {
         await firstMessage.edit({
@@ -124,6 +126,8 @@ export const newThread = async(client: CustomClient, request: RegradeRequest) =>
     dashboardBuilder
         .disableRegrader()
         .disableThread();
+    if(!request.approved_at) dashboardBuilder.disablePaymentStatus();
+
     let dashboard = dashboardBuilder.buildDashboard();
 
     //search for tag

@@ -29,7 +29,8 @@ module.exports = {
 			dashboardBuilder
 				.enableReview()
 				.disableRegradedAt()
-				.disableApprovedAt();
+				.disableApprovedAt()
+				.disablePaymentStatus();
 
 			let {
 				dashboard,
