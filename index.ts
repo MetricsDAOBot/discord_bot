@@ -1,8 +1,8 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Events, ForumChannel, GatewayIntentBits, ModalBuilder, TextChannel, TextInputBuilder, TextInputStyle, ThreadChannel } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, Events, GatewayIntentBits, ModalBuilder, TextChannel, TextInputBuilder, TextInputStyle, ThreadChannel } from 'discord.js';
 import { CustomClient } from './utils/CustomClient';
 import 'dotenv/config';
 import axios from './services/axios';
-import { closeThread, deleteReplyInteractionAfterSeconds, isValidUUID, newThread, updateRequestDetails, updateTags } from './utils/common';
+import { closeThread, deleteReplyInteractionAfterSeconds, isValidUUID, newThread, updateRequestDetails, updateTags, updateTagsWithMultipleRemarks } from './utils/common';
 import { RegradeRequest } from './commands/types';
 import { DashboardBuilder } from './utils/DashboardBuilder';
 
@@ -135,7 +135,21 @@ client.on(Events.InteractionCreate, async interaction => {
 
 		if(request.data[0]?.thread_id) {
 			await updateRequestDetails(client, request.data[0]);
-			await updateTags(client, request.data[0].thread_id, "Pending Approval", `Request reviewed. \`\`\`Regraded Score: ${regraded_score}\`\`\``);
+			await updateTagsWithMultipleRemarks(
+				client, 
+				request.data[0].thread_id, 
+				"Pending Approval", 
+				[
+					{
+						title: "",
+						value: `Request reviewed. \`\`\`Regraded Score: ${regraded_score}\`\`\``,
+					},
+					{
+						title: "Regraded Reason",
+						value: regraded_reason
+					}
+				]
+			);
 		}
 
 		await deleteReplyInteractionAfterSeconds(interaction, 'Your review was received successfully!', 5);
@@ -175,7 +189,7 @@ client.on(Events.InteractionCreate, async interaction => {
 		const regradeReasonInput = new TextInputBuilder()
 			.setCustomId('regraded_reason')
 			// The label is the prompt the user sees for this input
-			.setLabel("Request Reason")
+			.setLabel("Regrade Reason")
 			// Short means only a single line of text
 			.setStyle(TextInputStyle.Paragraph)
 			.setRequired(true);

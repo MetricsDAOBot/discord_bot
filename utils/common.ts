@@ -43,8 +43,12 @@ export async function deleteReplyInteractionAfterSeconds(interaction: ChatInputC
 export const sendMessageInParts = async(thread: TextChannel | ThreadChannel, title: string, message: string) => {
     message = message.replace(/(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/g, '<$1>');
     
+    if(title) {
+        await thread.send(`__**${title}**__`);
+    }
+
     if(message.length <= PAGE_CHAR_LENGTH) {
-        await thread.send(`__**${title}**__\n${message}`);
+        await thread.send(`\n${message}`);
         return;
     }
 
@@ -53,14 +57,7 @@ export const sendMessageInParts = async(thread: TextChannel | ThreadChannel, tit
     wordArray = message.split(" ");
     let page = 1;
 
-    let currentStringIndex = 0;
-    let wordIndex = 0;
-
-    thread.send(`__**${title}**__`);
-
     for(const word of wordArray) {
-        wordIndex++;
-        currentStringIndex += word.length + 1; // + 1 cause we need to include one space bar
         replyMessage += `${word} `;
 
         // max page length reached
@@ -112,6 +109,21 @@ export const updateTags = async(client: CustomClient, threadId: string, tagName:
 
     if(remark) {
         await thread.send(remark);
+    }
+    return;
+}
+
+export const updateTagsWithMultipleRemarks = async(client: CustomClient, threadId: string, tagName: string, remarks: { title: string, value: string }[]) => {
+    let channel = client.channels.cache.get(DISCORD_COMMUNITY_FORUM_ID) as ForumChannel;
+    let thread = client.channels.cache.get(threadId) as ThreadChannel;
+    let newTags = channel.availableTags.filter(x => x.name === tagName);
+    await thread.setAppliedTags(newTags.map(x => x.id));
+
+    if(remarks.length > 0) {
+        for(const { title, value } of remarks) {
+            await sendMessageInParts(thread, title, value);
+
+        }
     }
     return;
 }
