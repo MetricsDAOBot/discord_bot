@@ -143,19 +143,19 @@ export const newThread = async(client: CustomClient, request: RegradeRequest) =>
     let dashboard = dashboardBuilder.buildDashboard();
 
     //search for tag
-    let tagName = "Open";
+    let tagName = "1. Open";
 
     if(request.approved_at) {
-        tagName = "Closed";
+        tagName = "6. Closed";
         return;
     }
 
     else if(request.regraded_score) {
-        tagName = "Pending Approval";
+        tagName = "3. Pending Approval";
     }
 
     else if(request.is_regrading) {
-        tagName = "Reviewing";
+        tagName = "2. Reviewing";
     }
 
     let tags = channel.availableTags.filter(x => x.name === tagName);

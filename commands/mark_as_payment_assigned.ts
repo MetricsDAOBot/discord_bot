@@ -29,7 +29,7 @@ module.exports = {
             // update tags and send message
             if(res.data.thread_id) {
                 await updateRequestDetails(client, res.data);
-                await updateTags(client, res.data.thread_id, "Payment Assigned", "This request has been assigned a payment.");
+                await updateTags(client, res.data.thread_id, "5. Payment Assigned", "This request has been assigned a payment.");
                 try {
                     await closeThread(client, res.data);
                 }

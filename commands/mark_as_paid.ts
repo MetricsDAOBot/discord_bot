@@ -35,7 +35,7 @@ module.exports = {
             // update tags and send message
             if(res.data.thread_id) {
                 await updateRequestDetails(client, res.data);
-                await updateTags(client, res.data.thread_id, "Closed", "This request has been paid.");
+                await updateTags(client, res.data.thread_id, "6. Closed", "This request has been paid.");
                 try {
                     await closeThread(client, res.data);
                 }

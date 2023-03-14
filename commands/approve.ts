@@ -32,7 +32,7 @@ module.exports = {
             // update tags and send message
             if(request.data[0]?.thread_id) {
                 await updateRequestDetails(client, request.data[0]);
-                let tag = (request.data[0].regraded_score ?? 0) > (request.data[0].current_score ?? 0)? "Payment Expected" :  "Closed";
+                let tag = (request.data[0].regraded_score ?? 0) > (request.data[0].current_score ?? 0)? "4. Payment Expected" :  "6. Closed";
                 await updateTags(client, request.data[0].thread_id, tag, `Request's regraded score has been approved.\n\`\`\`Old Score: ${request.data[0].current_score}\nNew Score: ${request.data[0].regraded_score}\`\`\``);
                 await closeThread(client, request.data[0]);
             }

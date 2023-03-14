@@ -31,7 +31,7 @@ module.exports = {
 
             if(request.data[0]?.thread_id) {
                 await updateRequestDetails(client, request.data[0]);
-                await updateTags(client, request.data[0].thread_id, "Open", `Request's regraded score has been rejected.`);
+                await updateTags(client, request.data[0].thread_id, "1. Open", `Request's regraded score has been rejected.`);
             }
 
             await deleteReplyInteractionAfterSeconds(interaction, "Rejected, request is now open for review!", 5, "update");

@@ -237,7 +237,7 @@ client.on(Events.InteractionCreate, async interaction => {
 				// update tags and send message
 				if(request.data[0]?.thread_id) {
 					await updateRequestDetails(client, request.data[0]);
-					await updateTags(client, request.data[0].thread_id, "Closed", `Request's regraded score has been approved.\n\`\`\`Old Score: ${request.data[0].current_score}\nNew Score: ${request.data[0].regraded_score}\`\`\``);
+					await updateTags(client, request.data[0].thread_id, "6. Closed", `Request's regraded score has been approved.\n\`\`\`Old Score: ${request.data[0].current_score}\nNew Score: ${request.data[0].regraded_score}\`\`\``);
 					await closeThread(client, request.data[0]);
 				}
 
@@ -267,7 +267,7 @@ client.on(Events.InteractionCreate, async interaction => {
 
 				if(request.data[0]?.thread_id) {
 					await updateRequestDetails(client, request.data[0]);
-					await updateTags(client, request.data[0].thread_id, "Open", `Request's regraded score has been rejected.`);
+					await updateTags(client, request.data[0].thread_id, "1. Open", `Request's regraded score has been rejected.`);
 				}
 
 				//decrease one page to not overflow
