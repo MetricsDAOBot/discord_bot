@@ -138,7 +138,7 @@ client.on(Events.InteractionCreate, async interaction => {
 			await updateTagsWithMultipleRemarks(
 				client, 
 				request.data[0].thread_id, 
-				"Pending Approval", 
+				"3. Pending Approval", 
 				[
 					{
 						title: "",
