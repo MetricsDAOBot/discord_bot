@@ -358,7 +358,7 @@ client.on(Events.InteractionCreate, async interaction => {
 
 			let dashboardBuilder = new DashboardBuilder(ret, `${user.username}'s Requests`, description);
 			dashboardBuilder
-				.disableRegrader()
+				// .disableRegrader()
 				.setNav("self", 0);
 
 			if(!ret.approved_at) dashboardBuilder.disablePaymentStatus();

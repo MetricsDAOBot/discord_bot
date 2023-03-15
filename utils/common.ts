@@ -85,7 +85,7 @@ export const updateRequestDetails = async(client: CustomClient, request: Regrade
 
     let dashboardBuilder = new DashboardBuilder(request, "Request Details");
     dashboardBuilder
-        .disableRegrader()
+        // .disableRegrader()
         .disableThread();
 
     if(!request.approved_at) dashboardBuilder.disablePaymentStatus();
@@ -136,7 +136,7 @@ export const newThread = async(client: CustomClient, request: RegradeRequest) =>
 
     let dashboardBuilder = new DashboardBuilder(request, "Request Details");
     dashboardBuilder
-        .disableRegrader()
+        // .disableRegrader()
         .disableThread();
     if(!request.approved_at) dashboardBuilder.disablePaymentStatus();
 

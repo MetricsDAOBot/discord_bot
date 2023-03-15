@@ -51,7 +51,7 @@ module.exports = {
 
 			let dashboardBuilder = new DashboardBuilder(ret, `${user.username}'s Requests`);
 			dashboardBuilder
-				.disableRegrader()
+				// .disableRegrader()
 				.disableButtonLeft()
 				.setNav("self", 0);
 
