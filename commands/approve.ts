@@ -17,11 +17,13 @@ module.exports = {
 			let { user } = interaction;
 
             await interaction.deferReply({ ephemeral: true });
+			let hasPayment = interaction.options.getBoolean('has_payment');
 
             let res = await axios.post<string>('/approve_regrade_request', {
                 discord_id: user.id,
                 discord_name: `${user.username}#${user.discriminator}`,
                 thread_id: interaction.channelId,
+                has_payment: hasPayment
             });
 
             // has error
@@ -31,8 +33,6 @@ module.exports = {
             }
 
             let request = await axios.get<RegradeRequest[]>(`/regrade_request_by_thread_id/${interaction.channelId}`);
-
-			let hasPayment = interaction.options.getBoolean('has_payment');
 
             // update tags and send message
             if(request.data[0]?.thread_id) {
