@@ -8,11 +8,11 @@ import { RegradeRequest } from "./types";
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('refresh')
-		.setDescription('Approve this request! (Only usable in request posts)'),
+		.setDescription('Refreshes the request\'s details.'),
 	async execute(interaction: ChatInputCommandInteraction<CacheType>, client: CustomClient) {
 		try {
             await interaction.deferReply({ ephemeral: true });
-            
+
             let request = await axios.get<RegradeRequest[]>(`/regrade_request_by_thread_id/${interaction.channelId}`);
 
             // update tags and send message
