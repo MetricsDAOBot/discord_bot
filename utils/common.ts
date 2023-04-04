@@ -19,6 +19,25 @@ export function sleep(ms: number) {
     });
 }
 
+/**
+ * Returns the ellipsized version of string
+ * @param x string
+ * @param leftCharLength number
+ * @param rightCharLength number
+ */
+export function ellipsizeThis(x: string, leftCharLength: number, rightCharLength: number) {
+    if(!x) {
+        return x;
+    }
+
+    let totalLength = leftCharLength + rightCharLength;
+
+    if(totalLength >= x.length) {
+        return x;
+    }
+
+    return x.substring(0, leftCharLength) + "..." + x.substring(x.length - rightCharLength, x.length);
+}
 
 /**
  * Deletes the reply after a few seconds
@@ -105,9 +124,11 @@ export const updateTags = async(client: CustomClient, threadId: string, tagName:
     let channel = client.channels.cache.get(DISCORD_COMMUNITY_FORUM_ID) as ForumChannel;
     let thread = client.channels.cache.get(threadId) as ThreadChannel;
     let newTags = channel.availableTags.filter(x => x.name === tagName);
-    await thread.setAppliedTags(newTags.map(x => x.id));
+    let newTagIds = newTags.map(x => x.id);
+    let sameTag = thread.appliedTags.filter(x => newTagIds.includes(x)).length > 0;
+    await thread.setAppliedTags(newTagIds);
 
-    if(remark) {
+    if(remark && !sameTag) {
         await thread.send(remark);
     }
     return;
@@ -160,7 +181,7 @@ export const newThread = async(client: CustomClient, request: RegradeRequest) =>
 
     let tags = channel.availableTags.filter(x => x.name === tagName);
     const thread = await channel.threads.create({
-        name: title,
+        name: ellipsizeThis(title, 90, 0),
         message: {
             content: message,
             embeds: [dashboard],

@@ -8,6 +8,9 @@ import { RegradeRequest } from "./types";
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('approve')
+		.addBooleanOption(option =>
+			option.setName('has_payment')
+				.setDescription('Approve with payment or not?'))
 		.setDescription('Approve this request! (Only usable in request posts)'),
 	async execute(interaction: ChatInputCommandInteraction<CacheType>, client: CustomClient) {
 		try {
@@ -29,11 +32,16 @@ module.exports = {
 
             let request = await axios.get<RegradeRequest[]>(`/regrade_request_by_thread_id/${interaction.channelId}`);
 
+			let hasPayment = interaction.options.getBoolean('has_payment');
+
             // update tags and send message
             if(request.data[0]?.thread_id) {
                 await updateRequestDetails(client, request.data[0]);
-                let tag = (request.data[0].regraded_score ?? 0) > (request.data[0].current_score ?? 0)? "4. Payment Expected" :  "6. Closed";
-                await updateTags(client, request.data[0].thread_id, tag, `Request's regraded score has been approved.\n\`\`\`Old Score: ${request.data[0].current_score}\nNew Score: ${request.data[0].regraded_score}\`\`\``);
+                let tag = hasPayment? "4. Payment Expected" :  "6. Closed";
+                let message = `Request's regraded score has been approved.\n\`\`\`Old Score: ${request.data[0].current_score}\nNew Score: ${request.data[0].regraded_score}\`\`\``;
+                message = message + (hasPayment? 'A payment is expected for this request.' :'Closing this request as no payment is needed.');
+                
+                await updateTags(client, request.data[0].thread_id, tag, );
                 await closeThread(client, request.data[0]);
             }
 
