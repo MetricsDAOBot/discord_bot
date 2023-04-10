@@ -31,10 +31,10 @@ module.exports = {
                 let {discord_name, created_at, updated_at, regraded_at, approved_at, uuid, is_regrading, submission, grader_feedback, current_score, expected_score, reason, regraded_score, regraded_reason, regraded_by} = request;
                 
                 // escape everything
-                submission = submission? submission.replace(/"/g, '""').replace(/\n/g, ' ').replace(/'/g, "''") : "";
-                grader_feedback = grader_feedback? grader_feedback.replace(/"/g, '""').replace(/\n/g, ' ').replace(/'/g, "''") : "";
-                reason = reason? reason.replace(/"/g, '""').replace(/\n/g, ' ').replace(/'/g, "''") : "";
-                regraded_reason = regraded_reason? regraded_reason.replace(/"/g, '""').replace(/\n/g, ' ').replace(/'/g, "''") : "";
+                submission = submission? submission.replace(/"/g, '""').replace(/\n/g, ' ') : "";
+                grader_feedback = grader_feedback? grader_feedback.replace(/"/g, '""').replace(/\n/g, ' ') : "";
+                reason = reason? reason.replace(/"/g, '""').replace(/\n/g, ' ') : "";
+                regraded_reason = regraded_reason? regraded_reason.replace(/"/g, '""').replace(/\n/g, ' ') : "";
                 
                 ret += `\n"${discord_name}","${created_at}","${updated_at}","${regraded_at ?? "Not Regraded"}","${approved_at ?? "Not Approved"}","${uuid}","${is_regrading? "Yes" : "No"}","${submission ?? "-"}","${grader_feedback ?? "-"}","${current_score ?? "-"}","${expected_score ?? "-"}","${reason ?? "-"}","${regraded_score ?? "-"}","${regraded_reason ?? "-"}"`;
                 if(shouldIncludeRegrader) {
