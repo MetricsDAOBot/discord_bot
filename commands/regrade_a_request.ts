@@ -39,7 +39,7 @@ module.exports = {
 
 			if(ret.thread_id) {
 				await updateRequestDetails(client, ret);
-				await updateTags(client, ret.thread_id, "2. Reviewing", `Request is being reviewed.`);
+				await updateTags(client, ret.thread_id, "2. Reviewing", `Request is being reviewed by <@${user.id}>.`);
 			}
 
 			await interaction.reply({ embeds: [dashboard], components: [...actionRows], ephemeral: true });

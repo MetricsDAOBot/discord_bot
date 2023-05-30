@@ -25,7 +25,7 @@ module.exports = {
 
 		catch (e){
 			console.log(e);
-            await deleteReplyInteractionAfterSeconds(interaction, "Unable to approve.", 5, "update");
+            await deleteReplyInteractionAfterSeconds(interaction, "Unable to refresh.", 5, "update");
 		}
 	},
 };
