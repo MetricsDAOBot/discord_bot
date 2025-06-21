@@ -20,7 +20,7 @@ export const PAGE_CHAR_LENGTH = 1900;
 client.on(Events.MessageCreate, async function(message) {
     if (message.author.bot) return;
 
-	if(message.content.match(/(?:^|\W)gm(?:$|\W)/) && !message.reference && !message.mentions.users.first()) {
+	if(message.content.match(/(?:^|\W)gm(?:$|\W)/i) && !message.reference && !message.mentions.users.first()) {
 		await message.reply({
 			content: `GM to you too, <@${message.member!.id}> !`,
 		});
