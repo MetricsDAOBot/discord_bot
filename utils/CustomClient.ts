@@ -14,7 +14,8 @@ export class CustomClient extends Client {
    this.loadCommands()
   }
   loadCommands() {
-    const commandsPath = path.join(__dirname, '../commands');
+    const commandsPath = __dirname + '/commands';
+    console.log({commandsPath});
     const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
 
     for (const file of commandFiles) {

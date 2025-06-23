@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "restart": "tsc && node index.js",
-    "deploy": "tsc && node deploy-commands.js",
+    "deploy": "tsc && node dist/deploy-commands.js",
     "dev": "nodemon --ext \"ts\" --exec \"tsc && cp .env dist/.env && node dist/index.js\"  --exclude node_modules . || exit 1"
   },
   "author": "Kida",
