@@ -20,9 +20,10 @@ export const PAGE_CHAR_LENGTH = 1900;
 client.on(Events.MessageCreate, async function(message) {
     if (message.author.bot) return;
 
-	if(message.content.match(/(?:^|\W)gm(?:$|\W)/i) && !message.reference && !message.mentions.users.first()) {
+	let gmMatch = message.content.match(/(?:^|\W)(gm)+(?:$|\W)/i);
+	if(gmMatch && !message.reference && !message.mentions.users.first()) {
 		await message.reply({
-			content: `GM to you too, <@${message.member!.id}> !`,
+			content: `${gmMatch[0]} to you too, <@${message.member!.id}> !`,
 		});
 		await message.react("🫡");
 	}
@@ -137,6 +138,10 @@ client.on(Events.MessageCreate, async function(message) {
 		}
 
 		await message.reply({ content: statements[randomStatement] });
+	}
+
+	if(message.content === "what is the colour of hokkien mee?") {
+		await message.reply({ content: "black" });
 	}
 });
 
