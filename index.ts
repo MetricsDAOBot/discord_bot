@@ -22,6 +22,114 @@ client.on(Events.MessageCreate, async function(message) {
 
 	let gmMatch = message.content.match(/(?:^|\W)(gm)+(?:$|\W)/i);
 	if(gmMatch && !message.reference && !message.mentions.users.first()) {
+		// tlm
+		if(message.member!.id === "332782904247713794") {
+			await message.reply({
+				content: `let's end this conversation here and also don't reply on me.`,
+			});
+			await message.react(":clown:");
+			return;
+		}
+
+		// ant
+		if(message.member!.id === "71946189913726976") {
+			await message.reply({
+				content: `DEEEEEEEEE EEENNNNNNNNNN`,
+			});
+			await message.react("🫡");
+			return;
+		}
+
+		// marqu
+		if(message.member!.id === "814154637279232010") {
+			await message.reply({
+				content: `https://www.youtube.com/watch?v=_-3bUh-9Ah8`,
+			});
+			await message.react("🫡");
+			return;
+		}
+
+		//sam
+		if(message.member!.id === "91003142916800512") {
+			await message.reply({
+				content: `${gmMatch[0]} to you too, fellow butt.`,
+			});
+			await message.react("🫡");
+			return;
+		}
+
+		//mary
+		if(message.member!.id === "973340973667090533") {
+			await message.reply({
+				content: `https://www.youtube.com/watch?v=jIQ6UV2onyI`,
+			});
+			await message.react("🫡");
+			return;
+		}
+
+		//ren
+		if(message.member!.id === "365855421896065026") {
+			await message.reply({
+				content: `hyperliquid`,
+			});
+			await message.react("🫡");
+			return;
+		}
+
+		//ramahar
+		if(message.member!.id === "695797033218605118") {
+			await message.reply({
+				content: `${gmMatch[0]} to you too, Kucoin spy.`,
+			});
+			await message.react("🫡");
+			return;
+		}
+
+		//piper
+		if(message.member!.id === "399258000314990592") {
+			await message.reply({
+				content: `Guten Morgen, Herr Piper`,
+			});
+			await message.react("🫡");
+			return;
+		}
+
+		//playwo
+		if(message.member!.id === "269131044123312129") {
+			await message.reply({
+				content: `${gmMatch[0]} to you too, FarsAIght to the moon.`,
+			});
+			await message.react("🫡");
+			return;
+		}
+
+		//sandesh
+		if(message.member!.id === "888479361949380658") {
+			await message.reply({
+				content: `${gmMatch[0]} to you too, follow Kida to distribute your wealth.`,
+			});
+			await message.react("🫡");
+			return;
+		}
+
+		//pine
+		if(message.member!.id === "703216589134364764") {
+			await message.reply({
+				content: `${gmMatch[0]} to you too, OG Pine.`,
+			});
+			await message.react("🫡");
+			return;
+		}
+
+		//brian
+		if(message.member!.id === "520810830976122905") {
+			await message.reply({
+				content: `${gmMatch[0]} to you too, destroyer of the pike population.`,
+			});
+			await message.react("🫡");
+			return;
+		}
+
 		await message.reply({
 			content: `${gmMatch[0]} to you too, <@${message.member!.id}> !`,
 		});
