@@ -27,7 +27,7 @@ client.on(Events.MessageCreate, async function(message) {
 			await message.reply({
 				content: `let's end this conversation here and also don't reply on me.`,
 			});
-			await message.react(":clown:");
+			await message.react("🤡");
 			return;
 		}
 
@@ -125,6 +125,23 @@ client.on(Events.MessageCreate, async function(message) {
 		if(message.member!.id === "520810830976122905") {
 			await message.reply({
 				content: `${gmMatch[0]} to you too, destroyer of the pike population.`,
+			});
+			await message.react("🫡");
+			return;
+		}
+
+		// wolf
+		if(message.member!.id === "449549881699205140") {
+			await message.reply({
+				content: `Hmm...this page doesn't exist. Try searching for something else.`,
+			});
+			return;
+		}
+
+		//gj
+		if(message.member!.id === "828115529394815037") {
+			await message.reply({
+				content: `wen payment`,
 			});
 			await message.react("🫡");
 			return;
