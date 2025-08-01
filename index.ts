@@ -1,8 +1,8 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, Events, GatewayIntentBits, ModalBuilder, TextChannel, TextInputBuilder, TextInputStyle, ThreadChannel } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, Events, GatewayIntentBits, Message, ModalBuilder, TextChannel, TextInputBuilder, TextInputStyle, ThreadChannel } from 'discord.js';
 import { CustomClient } from './utils/CustomClient';
 import 'dotenv/config';
 import axios from './services/axios';
-import { closeThread, deleteReplyInteractionAfterSeconds, isValidUUID, newThread, updateRequestDetails, updateTags, updateTagsWithMultipleRemarks } from './utils/common';
+import { closeThread, deleteReplyInteractionAfterSeconds, isValidUUID, newThread, sendMessageInParts, updateRequestDetails, updateTags, updateTagsWithMultipleRemarks } from './utils/common';
 import { RegradeRequest } from './commands/types';
 import { DashboardBuilder } from './utils/DashboardBuilder';
 
@@ -16,25 +16,29 @@ const client = new CustomClient({intents: [
     GatewayIntentBits.MessageContent,
 ]});
 export const PAGE_CHAR_LENGTH = 1900;
-
+let hasSpoken = false;
 client.on(Events.MessageCreate, async function(message) {
     if (message.author.bot) return;
+	if(!hasSpoken && message.content === "say sorry") {
+		hasSpoken = true;
+		await message.channel.send(`Sorry <@332782904247713794>, please don't rage quit gms.`)
+	}
 
 	let gmMatch = message.content.match(/(?:^|\W)(gm)+(?:$|\W)/i);
 	if(gmMatch && !message.reference && !message.mentions.users.first()) {
 		// tlm
 		if(message.member!.id === "332782904247713794") {
 			await message.reply({
-				content: `let's end this conversation here and also don't reply on me.`,
+				content: `GM TO YOU TLM, MAY YOU CONTINUE LAUGHING, MAY JOJO HAVE LONG WALKS.`,
 			});
-			await message.react("🤡");
+			await message.react("🫡");
 			return;
 		}
 
 		// ant
 		if(message.member!.id === "71946189913726976") {
 			await message.reply({
-				content: `DEEEEEEEEE EEENNNNNNNNNN`,
+				content: `${gmMatch[0]} to you too, Mr Ant.`,
 			});
 			await message.react("🫡");
 			return;
