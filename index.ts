@@ -29,7 +29,7 @@ client.on(Events.MessageCreate, async function(message) {
 		// tlm
 		if(message.member!.id === "332782904247713794") {
 			await message.reply({
-				content: `GM TO YOU TLM, MAY YOU CONTINUE LAUGHING, MAY JOJO HAVE LONG WALKS.`,
+				content: `GM, any new tards to block on X?`,
 			});
 			await message.react("🫡");
 			return;
@@ -38,7 +38,7 @@ client.on(Events.MessageCreate, async function(message) {
 		// ant
 		if(message.member!.id === "71946189913726976") {
 			await message.reply({
-				content: `${gmMatch[0]} to you too, Mr Ant.`,
+				content: `Greeting.random()`,
 			});
 			await message.react("🫡");
 			return;
@@ -47,7 +47,7 @@ client.on(Events.MessageCreate, async function(message) {
 		// marqu
 		if(message.member!.id === "814154637279232010") {
 			await message.reply({
-				content: `https://www.youtube.com/watch?v=_-3bUh-9Ah8`,
+				content: `baaaaaaaaaaaaaaa`,
 			});
 			await message.react("🫡");
 			return;
@@ -65,7 +65,7 @@ client.on(Events.MessageCreate, async function(message) {
 		//mary
 		if(message.member!.id === "973340973667090533") {
 			await message.reply({
-				content: `https://www.youtube.com/watch?v=jIQ6UV2onyI`,
+				content: `Please dont reschedule playwo's call again.`,
 			});
 			await message.react("🫡");
 			return;
@@ -74,7 +74,7 @@ client.on(Events.MessageCreate, async function(message) {
 		//ren
 		if(message.member!.id === "365855421896065026") {
 			await message.reply({
-				content: `hyperliquid`,
+				content: `wen wrench party`,
 			});
 			await message.react("🫡");
 			return;
@@ -83,7 +83,7 @@ client.on(Events.MessageCreate, async function(message) {
 		//ramahar
 		if(message.member!.id === "695797033218605118") {
 			await message.reply({
-				content: `${gmMatch[0]} to you too, Kucoin spy.`,
+				content: `quit binance`,
 			});
 			await message.react("🫡");
 			return;
@@ -92,7 +92,7 @@ client.on(Events.MessageCreate, async function(message) {
 		//piper
 		if(message.member!.id === "399258000314990592") {
 			await message.reply({
-				content: `Guten Morgen, Herr Piper`,
+				content: `wen mute TLM`,
 			});
 			await message.react("🫡");
 			return;
@@ -101,7 +101,7 @@ client.on(Events.MessageCreate, async function(message) {
 		//playwo
 		if(message.member!.id === "269131044123312129") {
 			await message.reply({
-				content: `${gmMatch[0]} to you too, FarsAIght to the moon.`,
+				content: `Go SG and employ Ant Services for 100% tax rebate.`,
 			});
 			await message.react("🫡");
 			return;
@@ -110,7 +110,7 @@ client.on(Events.MessageCreate, async function(message) {
 		//sandesh
 		if(message.member!.id === "888479361949380658") {
 			await message.reply({
-				content: `${gmMatch[0]} to you too, follow Kida to distribute your wealth.`,
+				content: `${gmMatch[0]} to you too, how's job hunting?`,
 			});
 			await message.react("🫡");
 			return;
@@ -119,7 +119,7 @@ client.on(Events.MessageCreate, async function(message) {
 		//pine
 		if(message.member!.id === "703216589134364764") {
 			await message.reply({
-				content: `${gmMatch[0]} to you too, OG Pine.`,
+				content: `${gmMatch[0]} to you too, you going Japan again?`,
 			});
 			await message.react("🫡");
 			return;
