@@ -29,7 +29,7 @@ client.on(Events.MessageCreate, async function(message) {
 		// tlm
 		if(message.member!.id === "332782904247713794") {
 			await message.reply({
-				content: `GM, any new tards to block on X?`,
+				content: `Why are you still in Flipside's TG?`,
 			});
 			await message.react("🫡");
 			return;
@@ -38,7 +38,7 @@ client.on(Events.MessageCreate, async function(message) {
 		// ant
 		if(message.member!.id === "71946189913726976") {
 			await message.reply({
-				content: `Greeting.random()`,
+				content: `I'm spreading the words for AntVentures2.0 for you my master.`,
 			});
 			await message.react("🫡");
 			return;
@@ -56,7 +56,7 @@ client.on(Events.MessageCreate, async function(message) {
 		//sam
 		if(message.member!.id === "91003142916800512") {
 			await message.reply({
-				content: `${gmMatch[0]} to you too, fellow butt.`,
+				content: `Hard mode wordle only please.`,
 			});
 			await message.react("🫡");
 			return;
@@ -65,7 +65,7 @@ client.on(Events.MessageCreate, async function(message) {
 		//mary
 		if(message.member!.id === "973340973667090533") {
 			await message.reply({
-				content: `Please dont reschedule playwo's call again.`,
+				content: `... is a pig.`,
 			});
 			await message.react("🫡");
 			return;
@@ -74,7 +74,7 @@ client.on(Events.MessageCreate, async function(message) {
 		//ren
 		if(message.member!.id === "365855421896065026") {
 			await message.reply({
-				content: `wen wrench party`,
+				content: `guess we're back to hyperliquid`,
 			});
 			await message.react("🫡");
 			return;
@@ -83,7 +83,7 @@ client.on(Events.MessageCreate, async function(message) {
 		//ramahar
 		if(message.member!.id === "695797033218605118") {
 			await message.reply({
-				content: `quit binance`,
+				content: `Kim Jung Un..`,
 			});
 			await message.react("🫡");
 			return;
@@ -92,7 +92,7 @@ client.on(Events.MessageCreate, async function(message) {
 		//piper
 		if(message.member!.id === "399258000314990592") {
 			await message.reply({
-				content: `wen mute TLM`,
+				content: `I'm running out of random greetings D:`,
 			});
 			await message.react("🫡");
 			return;
@@ -101,7 +101,7 @@ client.on(Events.MessageCreate, async function(message) {
 		//playwo
 		if(message.member!.id === "269131044123312129") {
 			await message.reply({
-				content: `Go SG and employ Ant Services for 100% tax rebate.`,
+				content: `AntVentures2.0 awaits`,
 			});
 			await message.react("🫡");
 			return;
@@ -119,7 +119,7 @@ client.on(Events.MessageCreate, async function(message) {
 		//pine
 		if(message.member!.id === "703216589134364764") {
 			await message.reply({
-				content: `${gmMatch[0]} to you too, you going Japan again?`,
+				content: `Ohayo gozaimasu!`,
 			});
 			await message.react("🫡");
 			return;
@@ -146,6 +146,21 @@ client.on(Events.MessageCreate, async function(message) {
 		if(message.member!.id === "828115529394815037") {
 			await message.reply({
 				content: `wen payment`,
+			});
+			await message.react("🫡");
+			return;
+		}
+
+		// fish
+		if(message.member!.id === "356937656900517899") {
+			await message.reply({
+				content: `Hey there! 🐟✈️
+
+Just flying by to say **"You're fintastic!"** — like a flying fish who forgot it’s not a bird but is *still totally committed to the bit.* 😄💨
+
+Hope your day takes off... but with *less flopping*!
+
+idk if it's funny but AI wrote this shit`,
 			});
 			await message.react("🫡");
 			return;
