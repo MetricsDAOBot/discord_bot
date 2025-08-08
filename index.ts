@@ -9,6 +9,8 @@ import { DashboardBuilder } from './utils/DashboardBuilder';
 const TOKEN = process.env.DISCORD_BOT_TOKEN;
 export const DISCORD_COMMUNITY_FORUM_ID = process.env.DISCORD_COMMUNITY_FORUM_ID!;
 
+let hasCustomed: {[key:string]: boolean} = {};
+
 const client = new CustomClient({intents: [
     GatewayIntentBits.DirectMessages,
     GatewayIntentBits.Guilds,
@@ -26,148 +28,153 @@ client.on(Events.MessageCreate, async function(message) {
 
 	let gmMatch = message.content.match(/(?:^|\W)(gm)+(?:$|\W)/i);
 	if(gmMatch && !message.reference && !message.mentions.users.first()) {
-		// tlm
-		if(message.member!.id === "332782904247713794") {
-			await message.reply({
-				content: `Why are you still in Flipside's TG?`,
-			});
-			await message.react("🫡");
-			return;
+		if(!hasCustomed[message.member!.id]) {
+			// tlm
+			// if(message.member!.id === "332782904247713794") {
+			// 	await message.reply({
+			// 		content: `Why are you still in Flipside's TG?`,
+			// 	});
+			// 	await message.react("🫡");
+			// 	return;
+			// }
+
+			// // ant
+			// if(message.member!.id === "71946189913726976") {
+			// 	await message.reply({
+			// 		content: `I'm spreading the words for AntVentures2.0 for you my master.`,
+			// 	});
+			// 	await message.react("🫡");
+			// 	return;
+			// }
+
+			// // marqu
+			// if(message.member!.id === "814154637279232010") {
+			// 	await message.reply({
+			// 		content: `baaaaaaaaaaaaaaa`,
+			// 	});
+			// 	await message.react("🫡");
+			// 	return;
+			// }
+
+			// //sam
+			// if(message.member!.id === "91003142916800512") {
+			// 	await message.reply({
+			// 		content: `Hard mode wordle only please.`,
+			// 	});
+			// 	await message.react("🫡");
+			// 	return;
+			// }
+
+			// //mary
+			// if(message.member!.id === "973340973667090533") {
+			// 	await message.reply({
+			// 		content: `... is a pig.`,
+			// 	});
+			// 	await message.react("🫡");
+			// 	return;
+			// }
+
+			// //ren
+			// if(message.member!.id === "365855421896065026") {
+			// 	await message.reply({
+			// 		content: `guess we're back to hyperliquid`,
+			// 	});
+			// 	await message.react("🫡");
+			// 	return;
+			// }
+
+			// //ramahar
+			// if(message.member!.id === "695797033218605118") {
+			// 	await message.reply({
+			// 		content: `Kim Jung Un..`,
+			// 	});
+			// 	await message.react("🫡");
+			// 	return;
+			// }
+
+			// //piper
+			// if(message.member!.id === "399258000314990592") {
+			// 	await message.reply({
+			// 		content: `I'm running out of random greetings D:`,
+			// 	});
+			// 	await message.react("🫡");
+			// 	return;
+			// }
+
+			// //playwo
+			// if(message.member!.id === "269131044123312129") {
+			// 	await message.reply({
+			// 		content: `AntVentures2.0 awaits`,
+			// 	});
+			// 	await message.react("🫡");
+			// 	return;
+			// }
+
+			// //sandesh
+			// if(message.member!.id === "888479361949380658") {
+			// 	await message.reply({
+			// 		content: `${gmMatch[0]} to you too, how's job hunting?`,
+			// 	});
+			// 	await message.react("🫡");
+			// 	return;
+			// }
+
+			// //pine
+			// if(message.member!.id === "703216589134364764") {
+			// 	await message.reply({
+			// 		content: `Ohayo gozaimasu!`,
+			// 	});
+			// 	await message.react("🫡");
+			// 	return;
+			// }
+
+			//brian
+			if(message.member!.id === "520810830976122905") {
+				await message.reply({
+					content: `${gmMatch[0]} to you too, destroyer of the pike population.`,
+				});
+				await message.react("🫡");
+				return;
+			}
+
+			// wolf
+			if(message.member!.id === "449549881699205140") {
+				await message.reply({
+					content: `Hmm...this page doesn't exist. Try searching for something else.`,
+				});
+				return;
+			}
+
+			//gj
+			if(message.member!.id === "828115529394815037") {
+				await message.reply({
+					content: `wen payment`,
+				});
+				await message.react("🫡");
+				return;
+			}
+
+	// 		// fish
+	// 		if(message.member!.id === "356937656900517899") {
+	// 			await message.reply({
+	// 				content: `Hey there! 🐟✈️
+
+	// Just flying by to say **"You're fintastic!"** — like a flying fish who forgot it’s not a bird but is *still totally committed to the bit.* 😄💨
+
+	// Hope your day takes off... but with *less flopping*!
+
+	// idk if it's funny but AI wrote this shit`,
+	// 			});
+	// 			await message.react("🫡");
+	// 			return;
+	// 		}
+			
 		}
 
-		// ant
-		if(message.member!.id === "71946189913726976") {
-			await message.reply({
-				content: `I'm spreading the words for AntVentures2.0 for you my master.`,
-			});
-			await message.react("🫡");
-			return;
-		}
-
-		// marqu
-		if(message.member!.id === "814154637279232010") {
-			await message.reply({
-				content: `baaaaaaaaaaaaaaa`,
-			});
-			await message.react("🫡");
-			return;
-		}
-
-		//sam
-		if(message.member!.id === "91003142916800512") {
-			await message.reply({
-				content: `Hard mode wordle only please.`,
-			});
-			await message.react("🫡");
-			return;
-		}
-
-		//mary
-		if(message.member!.id === "973340973667090533") {
-			await message.reply({
-				content: `... is a pig.`,
-			});
-			await message.react("🫡");
-			return;
-		}
-
-		//ren
-		if(message.member!.id === "365855421896065026") {
-			await message.reply({
-				content: `guess we're back to hyperliquid`,
-			});
-			await message.react("🫡");
-			return;
-		}
-
-		//ramahar
-		if(message.member!.id === "695797033218605118") {
-			await message.reply({
-				content: `Kim Jung Un..`,
-			});
-			await message.react("🫡");
-			return;
-		}
-
-		//piper
-		if(message.member!.id === "399258000314990592") {
-			await message.reply({
-				content: `I'm running out of random greetings D:`,
-			});
-			await message.react("🫡");
-			return;
-		}
-
-		//playwo
-		if(message.member!.id === "269131044123312129") {
-			await message.reply({
-				content: `AntVentures2.0 awaits`,
-			});
-			await message.react("🫡");
-			return;
-		}
-
-		//sandesh
-		if(message.member!.id === "888479361949380658") {
-			await message.reply({
-				content: `${gmMatch[0]} to you too, how's job hunting?`,
-			});
-			await message.react("🫡");
-			return;
-		}
-
-		//pine
-		if(message.member!.id === "703216589134364764") {
-			await message.reply({
-				content: `Ohayo gozaimasu!`,
-			});
-			await message.react("🫡");
-			return;
-		}
-
-		//brian
-		if(message.member!.id === "520810830976122905") {
-			await message.reply({
-				content: `${gmMatch[0]} to you too, destroyer of the pike population.`,
-			});
-			await message.react("🫡");
-			return;
-		}
-
-		// wolf
-		if(message.member!.id === "449549881699205140") {
-			await message.reply({
-				content: `Hmm...this page doesn't exist. Try searching for something else.`,
-			});
-			return;
-		}
-
-		//gj
-		if(message.member!.id === "828115529394815037") {
-			await message.reply({
-				content: `wen payment`,
-			});
-			await message.react("🫡");
-			return;
-		}
-
-		// fish
-		if(message.member!.id === "356937656900517899") {
-			await message.reply({
-				content: `Hey there! 🐟✈️
-
-Just flying by to say **"You're fintastic!"** — like a flying fish who forgot it’s not a bird but is *still totally committed to the bit.* 😄💨
-
-Hope your day takes off... but with *less flopping*!
-
-idk if it's funny but AI wrote this shit`,
-			});
-			await message.react("🫡");
-			return;
-		}
+		hasCustomed[message.member!.id] = true;
 
 		await message.reply({
-			content: `${gmMatch[0]} to you too, <@${message.member!.id}> !`,
+			content: `Master says AI soon tm. In the meantime, ${gmMatch[0]} to you too, <@${message.member!.id}> !`,
 		});
 		await message.react("🫡");
 	}
