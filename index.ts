@@ -119,6 +119,17 @@ const getGm = async(id: string) => {
 	return undefined;
 }
 
+function chunkSubstr(str: string, size: number) {
+  const numChunks = Math.ceil(str.length / size)
+  const chunks = new Array(numChunks)
+
+  for (let i = 0, o = 0; i < numChunks; ++i, o += size) {
+    chunks[i] = str.substr(o, size)
+  }
+
+  return chunks
+}
+
 client.on(Events.MessageCreate, async function(message) {
     if (message.author.bot) return;
 
@@ -142,6 +153,16 @@ client.on(Events.MessageCreate, async function(message) {
 			summary = "I CANT THINK NO MO..";
 		}
 
+		else {
+			const chunks = chunkSubstr(summary, 1800);
+			for(const chunk of chunks) {
+				await message.channel.send({
+					content: chunk,
+				});
+			}
+			summary = "DONE THINKING..";
+		}
+
 		await reply.edit({
 			content: summary,
 		});
@@ -157,6 +178,17 @@ client.on(Events.MessageCreate, async function(message) {
 			summary = "I CANT THINK NO MO..";
 		}
 
+		else {
+			const chunks = chunkSubstr(summary, 1800);
+			for(const chunk of chunks) {
+				await message.channel.send({
+					content: chunk,
+				});
+			}
+			summary = "DONE THINKING..";
+		}
+
+		
 		await reply.edit({
 			content: summary,
 		});
