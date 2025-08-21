@@ -5,11 +5,26 @@ import axios from './services/axios';
 import { closeThread, deleteReplyInteractionAfterSeconds, isValidUUID, newThread, sendMessageInParts, updateRequestDetails, updateTags, updateTagsWithMultipleRemarks } from './utils/common';
 import { RegradeRequest } from './commands/types';
 import { DashboardBuilder } from './utils/DashboardBuilder';
+import OpenAI from 'openai';
+import moment from 'moment';
+import _ from 'lodash';
 
 const TOKEN = process.env.DISCORD_BOT_TOKEN;
+const OPENROUTER_TOKEN = process.env.OPENROUTER_TOKEN;
+const openai = new OpenAI({
+	baseURL: "https://openrouter.ai/api/v1",
+	apiKey: OPENROUTER_TOKEN,
+});
+
 export const DISCORD_COMMUNITY_FORUM_ID = process.env.DISCORD_COMMUNITY_FORUM_ID!;
 
 let hasCustomed: {[key:string]: boolean} = {};
+let pastMessages: {
+	date: string;
+	author: string;
+	author_id: string;
+	message: string;
+}[] = [];
 
 const client = new CustomClient({intents: [
     GatewayIntentBits.DirectMessages,
@@ -18,12 +33,134 @@ const client = new CustomClient({intents: [
     GatewayIntentBits.MessageContent,
 ]});
 export const PAGE_CHAR_LENGTH = 1900;
-let hasSpoken = false;
+
+const getSummary = async() => {
+    try {
+		if(pastMessages.length < 10) {
+			return undefined;
+		}
+
+		const messages = pastMessages.map(x => _.omit(x, "author_id"));
+        const content = `The following are in this format: { date: "YYYY-MM-DD HH:mm:ss", author: "string", message: "string" }, parse them and say something funny about it. Only write the punchline. ${JSON.stringify(messages)}`;
+        const completion = await openai.chat.completions.create({
+            model: "z-ai/glm-4.5-air:free",
+            messages: [
+                {
+                    role: "user",
+                    content,
+                }
+            ]
+        });
+
+        return completion.choices[0].message.content;
+    }
+
+    catch(e) {
+        console.log(e);
+    }
+
+	return undefined;
+}
+
+const getDetailedSummary = async() => {
+    try {
+		if(pastMessages.length < 10) {
+			return undefined;
+		}
+
+		const messages = pastMessages.map(x => _.omit(x, "author_id"));
+        const content = `The following are in this format: { date: "YYYY-MM-DD HH:mm:ss", author: "string", message: "string" }, parse them and give a summary for each author. ${JSON.stringify(messages)}`;
+        const completion = await openai.chat.completions.create({
+            model: "z-ai/glm-4.5-air:free",
+            messages: [
+                {
+                    role: "user",
+                    content,
+                }
+            ]
+        });
+
+        return completion.choices[0].message.content;
+    }
+
+    catch(e) {
+        console.log(e);
+    }
+
+	return undefined;
+}
+
+const getGm = async(id: string) => {
+    try {
+		const filtered = pastMessages.filter(x => x.author_id === id);
+		if(filtered.length < 10) {
+			return undefined;
+		}
+		const messages = filtered.map(x => _.omit(x, "author_id"));
+
+        const content = `The following are in this format: { date: "YYYY-MM-DD HH:mm:ss", author: "string", message: "string" }, parse them and say something funny about it. Only write the punchline, must include gm in the punchline. ${JSON.stringify(messages)}`;
+        const completion = await openai.chat.completions.create({
+            model: "z-ai/glm-4.5-air:free",
+            messages: [
+                {
+                    role: "user",
+                    content,
+                }
+            ]
+        });
+
+        return completion.choices[0].message.content;
+    }
+
+    catch(e) {
+        console.log(e);
+    }
+
+	return undefined;
+}
+
 client.on(Events.MessageCreate, async function(message) {
     if (message.author.bot) return;
-	if(!hasSpoken && message.content === "say sorry") {
-		hasSpoken = true;
-		await message.channel.send(`Sorry <@332782904247713794>, please don't rage quit gms.`)
+
+	pastMessages.unshift({
+		date: moment().format("YYYY-MM-DD HH:mm:ss"),
+		author: message.author.displayName,
+		author_id: message.author.id,
+		message: message.content,
+	});
+
+	if(pastMessages.length > 1000) {
+		pastMessages.pop();
+	}
+
+	if(message.content.toLowerCase().trim() === "summary") {
+		let reply = await message.reply({
+			content: "Thinking..",
+		});
+		let summary = await getSummary();
+		if(!summary) {
+			summary = "I CANT THINK NO MO..";
+		}
+
+		await reply.edit({
+			content: summary,
+		});
+		return;
+	}
+
+	if(message.content.toLowerCase().trim() === "serious summary") {
+		let reply = await message.reply({
+			content: "Thinking..",
+		});
+		let summary = await getDetailedSummary();
+		if(!summary) {
+			summary = "I CANT THINK NO MO..";
+		}
+
+		await reply.edit({
+			content: summary,
+		});
+		return;
 	}
 
 	let gmMatch = message.content.match(/(?:^|\W)(gm)+(?:$|\W)/i);
@@ -173,10 +310,17 @@ client.on(Events.MessageCreate, async function(message) {
 
 		hasCustomed[message.member!.id] = true;
 
-		await message.reply({
-			content: `Master says AI soon tm. In the meantime, ${gmMatch[0]} to you too, <@${message.member!.id}> !`,
+		let reply = await message.reply({
+			content: `${gmMatch[0]} to you too, <@${message.member!.id}> !`,
 		});
 		await message.react("🫡");
+
+		let gmMessage = await getGm(message.author.id);
+		if(gmMessage) {
+			await reply.edit({
+				content: gmMessage,
+			});
+		}
 	}
 
 	if(message.content === "is bak kut teh pepper soup?") {
