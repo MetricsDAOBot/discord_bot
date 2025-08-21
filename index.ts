@@ -18,6 +18,7 @@ const openai = new OpenAI({
 });
 
 export const DISCORD_COMMUNITY_FORUM_ID = process.env.DISCORD_COMMUNITY_FORUM_ID!;
+const filePath = __dirname + "/messages.txt";
 
 let hasCustomed: {[key:string]: boolean} = {};
 let pastMessages: {
@@ -132,7 +133,9 @@ function chunkSubstr(str: string, size: number) {
 }
 
 function getMessages() {
-	let content = fs.readFileSync(__dirname + "/messages.txt");
+	if(!fs.existsSync(filePath)) return;
+	
+	let content = fs.readFileSync(filePath);
 	let str = content.toString();
 	if(!str) return;
 	try {
@@ -145,7 +148,7 @@ function getMessages() {
 }
 
 function saveMessages() {
-	fs.writeFileSync(__dirname + "/messages.txt", JSON.stringify(pastMessages));
+	fs.writeFileSync(filePath, JSON.stringify(pastMessages));
 }
 
 getMessages();
