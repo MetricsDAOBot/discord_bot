@@ -8,6 +8,7 @@ import { DashboardBuilder } from './utils/DashboardBuilder';
 import OpenAI from 'openai';
 import moment from 'moment';
 import _ from 'lodash';
+import fs from 'fs';
 
 const TOKEN = process.env.DISCORD_BOT_TOKEN;
 const OPENROUTER_TOKEN = process.env.OPENROUTER_TOKEN;
@@ -130,19 +131,27 @@ function chunkSubstr(str: string, size: number) {
   return chunks
 }
 
+function getMessages() {
+	let content = fs.readFileSync(__dirname + "/messages.txt");
+	let str = content.toString();
+	if(!str) return;
+	try {
+		pastMessages = JSON.parse(str);
+	}
+
+	catch {
+		// do nothing
+	}
+}
+
+function saveMessages() {
+	fs.writeFileSync(__dirname + "/messages.txt", JSON.stringify(pastMessages));
+}
+
+getMessages();
+
 client.on(Events.MessageCreate, async function(message) {
     if (message.author.bot) return;
-
-	pastMessages.unshift({
-		date: moment().format("YYYY-MM-DD HH:mm:ss"),
-		author: message.author.displayName,
-		author_id: message.author.id,
-		message: message.content,
-	});
-
-	if(pastMessages.length > 1000) {
-		pastMessages.pop();
-	}
 
 	if(message.content.toLowerCase().trim() === "summary") {
 		let reply = await message.reply({
@@ -353,6 +362,22 @@ client.on(Events.MessageCreate, async function(message) {
 				content: gmMessage,
 			});
 		}
+	}
+
+	else {
+		// non gm messages
+		pastMessages.unshift({
+			date: moment().format("YYYY-MM-DD HH:mm:ss"),
+			author: message.author.displayName,
+			author_id: message.author.id,
+			message: message.content,
+		});
+
+		if(pastMessages.length > 500) {
+			pastMessages.pop();
+		}
+
+		saveMessages();
 	}
 
 	if(message.content === "is bak kut teh pepper soup?") {
