@@ -12,6 +12,7 @@ import fs from 'fs';
 
 const TOKEN = process.env.DISCORD_BOT_TOKEN;
 const OPENROUTER_TOKEN = process.env.OPENROUTER_TOKEN;
+const AI_MODEL = process.env.AI_MODEL!;
 const openai = new OpenAI({
 	baseURL: "https://openrouter.ai/api/v1",
 	apiKey: OPENROUTER_TOKEN,
@@ -45,7 +46,7 @@ const getSummary = async() => {
 		const messages = pastMessages.map(x => _.omit(x, "author_id"));
         const content = `The following are in this format: { date: "YYYY-MM-DD HH:mm:ss", author: "string", message: "string" }, parse them and say something funny about it. Only write the punchline. ${JSON.stringify(messages)}`;
         const completion = await openai.chat.completions.create({
-            model: "z-ai/glm-4.5-air:free",
+            model: AI_MODEL,
             messages: [
                 {
                     role: "user",
@@ -71,9 +72,9 @@ const getDetailedSummary = async() => {
 		}
 
 		const messages = pastMessages.map(x => _.omit(x, "author_id"));
-        const content = `The following are in this format: { date: "YYYY-MM-DD HH:mm:ss", author: "string", message: "string" }, parse them and give a summary for each author. ${JSON.stringify(messages)}`;
+        const content = `The following are in this format: { date: "YYYY-MM-DD HH:mm:ss", author: "string", message: "string" }, parse them and provide a 20-word summary for each author. ${JSON.stringify(messages)}`;
         const completion = await openai.chat.completions.create({
-            model: "z-ai/glm-4.5-air:free",
+            model: AI_MODEL,
             messages: [
                 {
                     role: "user",
@@ -102,7 +103,7 @@ const getGm = async(id: string) => {
 
         const content = `The following are in this format: { date: "YYYY-MM-DD HH:mm:ss", author: "string", message: "string" }, parse them and say something funny about it. Only write the punchline, must include gm in the punchline. ${JSON.stringify(messages)}`;
         const completion = await openai.chat.completions.create({
-            model: "z-ai/glm-4.5-air:free",
+            model: AI_MODEL,
             messages: [
                 {
                     role: "user",
