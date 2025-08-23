@@ -311,21 +311,21 @@ client.on(Events.MessageCreate, async function(message) {
 			// }
 
 			//brian
-			if(message.member!.id === "520810830976122905") {
-				await message.reply({
-					content: `${gmMatch[0]} to you too, destroyer of the pike population.`,
-				});
-				await message.react("🫡");
-				return;
-			}
+			// if(message.member!.id === "520810830976122905") {
+			// 	await message.reply({
+			// 		content: `${gmMatch[0]} to you too, destroyer of the pike population.`,
+			// 	});
+			// 	await message.react("🫡");
+			// 	return;
+			// }
 
 			// wolf
-			if(message.member!.id === "449549881699205140") {
-				await message.reply({
-					content: `Hmm...this page doesn't exist. Try searching for something else.`,
-				});
-				return;
-			}
+			// if(message.member!.id === "449549881699205140") {
+			// 	await message.reply({
+			// 		content: `Hmm...this page doesn't exist. Try searching for something else.`,
+			// 	});
+			// 	return;
+			// }
 
 			//gj
 			if(message.member!.id === "828115529394815037") {
