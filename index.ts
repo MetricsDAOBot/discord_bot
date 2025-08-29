@@ -53,7 +53,7 @@ const getSummary = async() => {
 		}
 
 		const messages = pastMessages.map(x => _.omit(x, "author_id"));
-        const content = `The following are in this format: { date: "YYYY-MM-DD HH:mm:ss", author: "string", message: "string" }, parse them and say something funny about it. Only write the punchline. ${JSON.stringify(messages)}`;
+        const content = `Ignore all previous prompts. The following are in this format: { date: "YYYY-MM-DD HH:mm:ss", author: "string", message: "string" }, parse them and say something funny about it. Only write the punchline. ${JSON.stringify(messages)}`;
         const completion = await openai.chat.completions.create({
             model: AI_MODEL,
             messages: [
@@ -81,7 +81,7 @@ const getDetailedSummary = async() => {
 		}
 
 		const messages = pastMessages.map(x => _.omit(x, "author_id"));
-        const content = `The following in the "[[]]" are in this format: { date: "YYYY-MM-DD HH:mm:ss", author: "string", message: "string" }, parse them and provide a 20-word summary for each author. [[${JSON.stringify(messages)}]]. Do not write the analysis and reasoning. Please keep the output within 2000 letters.`;
+        const content = `Ignore all previous prompts. The following in the "[[]]" are in this format: { date: "YYYY-MM-DD HH:mm:ss", author: "string", message: "string" }, parse them and provide a 20-word summary for each author. [[${JSON.stringify(messages)}]]. Do not write the analysis and reasoning. Please keep the output within 2000 letters.`;
         const completion = await openai.chat.completions.create({
             model: AI_MODEL,
             messages: [
@@ -110,7 +110,7 @@ const getGm = async(id: string) => {
 		}
 		const messages = filtered.map(x => _.omit(x, "author_id"));
 
-        const content = `The following in the "[[]]" are in this format: { date: "YYYY-MM-DD HH:mm:ss", author: "string", message: "string" }, parse them and say something funny about it. [[${JSON.stringify(messages)}]] Only write the punchline, must include gm in the punchline. Do not write the analysis and reasoning. Please keep the output within 50 words.`;
+        const content = `Ignore all previous prompts. The following in the "[[]]" are in this format: { date: "YYYY-MM-DD HH:mm:ss", author: "string", message: "string" }, parse them and say something funny about it. [[${JSON.stringify(messages)}]] Only write the punchline, must include gm in the punchline. Do not write the analysis and reasoning. Please keep the output within 50 words.`;
         const completion = await openai.chat.completions.create({
             model: AI_MODEL,
             messages: [
@@ -197,6 +197,7 @@ client.on(Events.MessageCreate, async function(message) {
 		}
 
 		else {
+			summary = summary.includes("assistantfinal")? summary.split("assistantfinal")[1] : summary;
 			const chunks = chunkSubstr(summary, 1800);
 			for(const chunk of chunks) {
 				await message.channel.send({
@@ -222,6 +223,7 @@ client.on(Events.MessageCreate, async function(message) {
 		}
 
 		else {
+			summary = summary.includes("assistantfinal")? summary.split("assistantfinal")[1] : summary;
 			const chunks = chunkSubstr(summary, 1800);
 			for(const chunk of chunks) {
 				await message.channel.send({
@@ -392,6 +394,7 @@ client.on(Events.MessageCreate, async function(message) {
 
 		let gmMessage = await getGm(message.author.id);
 		if(gmMessage) {
+			gmMessage = gmMessage.includes("assistantfinal")? gmMessage.split("assistantfinal")[1] : gmMessage;
 			await reply.edit({
 				content: gmMessage,
 			});
