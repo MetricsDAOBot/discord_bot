@@ -105,7 +105,7 @@ const getDetailedSummary = async() => {
 const getGm = async(id: string) => {
     try {
 		const filtered = pastAuthorMessages[id];
-		if(filtered.length < 10) {
+		if(!filtered || filtered.length < 10) {
 			return undefined;
 		}
 		const messages = filtered.map(x => _.omit(x, "author_id"));
