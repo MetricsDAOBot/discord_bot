@@ -20,6 +20,7 @@ const openai = new OpenAI({
 
 export const DISCORD_COMMUNITY_FORUM_ID = process.env.DISCORD_COMMUNITY_FORUM_ID!;
 const filePath = __dirname + "/messages.txt";
+const authorFilePath = __dirname + "/author_messages.txt";
 
 let hasCustomed: {[key:string]: boolean} = {};
 let pastMessages: {
@@ -28,6 +29,14 @@ let pastMessages: {
 	author_id: string;
 	message: string;
 }[] = [];
+
+let pastAuthorMessages: {
+	[key: string]: {
+		date: string;
+		author: string;
+		message: string;
+	}[]
+} = {};
 
 const client = new CustomClient({intents: [
     GatewayIntentBits.DirectMessages,
@@ -72,7 +81,7 @@ const getDetailedSummary = async() => {
 		}
 
 		const messages = pastMessages.map(x => _.omit(x, "author_id"));
-        const content = `The following are in this format: { date: "YYYY-MM-DD HH:mm:ss", author: "string", message: "string" }, parse them and provide a 20-word summary for each author. ${JSON.stringify(messages)}`;
+        const content = `The following in the "[[]]" are in this format: { date: "YYYY-MM-DD HH:mm:ss", author: "string", message: "string" }, parse them and provide a 20-word summary for each author. [[${JSON.stringify(messages)}]]. Do not write the analysis and reasoning. Please keep the output within 2000 letters.`;
         const completion = await openai.chat.completions.create({
             model: AI_MODEL,
             messages: [
@@ -95,13 +104,13 @@ const getDetailedSummary = async() => {
 
 const getGm = async(id: string) => {
     try {
-		const filtered = pastMessages.filter(x => x.author_id === id);
+		const filtered = pastAuthorMessages[id];
 		if(filtered.length < 10) {
 			return undefined;
 		}
 		const messages = filtered.map(x => _.omit(x, "author_id"));
 
-        const content = `The following are in this format: { date: "YYYY-MM-DD HH:mm:ss", author: "string", message: "string" }, parse them and say something funny about it. Only write the punchline, must include gm in the punchline. ${JSON.stringify(messages)}`;
+        const content = `The following in the "[[]]" are in this format: { date: "YYYY-MM-DD HH:mm:ss", author: "string", message: "string" }, parse them and say something funny about it. [[${JSON.stringify(messages)}]] Only write the punchline, must include gm in the punchline. Do not write the analysis and reasoning. Please keep the output within 50 words.`;
         const completion = await openai.chat.completions.create({
             model: AI_MODEL,
             messages: [
@@ -152,7 +161,28 @@ function saveMessages() {
 	fs.writeFileSync(filePath, JSON.stringify(pastMessages));
 }
 
+function getAuthorMessages() {
+	if(!fs.existsSync(filePath)) return;
+	
+	let content = fs.readFileSync(filePath);
+	let str = content.toString();
+	if(!str) return;
+	try {
+		pastAuthorMessages = JSON.parse(str);
+	}
+
+	catch {
+		// do nothing
+	}
+}
+
+function saveAuthorMessages() {
+	fs.writeFileSync(authorFilePath, JSON.stringify(pastAuthorMessages));
+}
+
+
 getMessages();
+getAuthorMessages();
 
 client.on(Events.MessageCreate, async function(message) {
     if (message.author.bot) return;
@@ -381,7 +411,22 @@ client.on(Events.MessageCreate, async function(message) {
 			pastMessages.pop();
 		}
 
+		if(!pastAuthorMessages[message.author.id]) {
+			pastAuthorMessages[message.author.id] = [];
+		}
+
+		pastAuthorMessages[message.author.id].unshift({
+			date: moment().format("YYYY-MM-DD HH:mm:ss"),
+			author: message.author.displayName,
+			message: message.content,
+		});
+
+		if(pastAuthorMessages[message.author.id].length > 20) {
+			pastAuthorMessages[message.author.id].pop();
+		}
+
 		saveMessages();
+		saveAuthorMessages();
 	}
 
 	if(message.content === "is bak kut teh pepper soup?") {
