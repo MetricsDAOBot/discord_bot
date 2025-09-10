@@ -162,9 +162,9 @@ function saveMessages() {
 }
 
 function getAuthorMessages() {
-	if(!fs.existsSync(filePath)) return;
+	if(!fs.existsSync(authorFilePath)) return;
 	
-	let content = fs.readFileSync(filePath);
+	let content = fs.readFileSync(authorFilePath);
 	let str = content.toString();
 	if(!str) return;
 	try {
